@@ -1,3 +1,7 @@
 [*.js]
 indent_size = 2
 indent_style = space
+
+[*.ts*]
+indent_size = 2
+indent_style = space
