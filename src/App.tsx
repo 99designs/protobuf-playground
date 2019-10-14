@@ -1,76 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Collapse from '@material-ui/core/Collapse';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
-
-import data from './proto.json';
+import root, { namespaces, services } from './proto';
 import protobuf from 'protobufjs';
 
-const root = protobuf.Root.fromJSON(data);
 const sdk = root.lookup('ninety_nine.sdk') as protobuf.Namespace;
-console.log(sdk.lookup('EmptyBrief'));
 
-const byName = (a: { name: string }, b: { name: string }) =>
-  a.name.localeCompare(b.name);
+const useStyles = makeStyles(theme => ({
+  root: {
+    backgroundColor: theme.palette.background.paper,
+  },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
+}));
 
-const services = (namespace: protobuf.Namespace): protobuf.Service[] => {
-  const services = namespace.nestedArray.filter(
-    (o): o is protobuf.Service => o instanceof protobuf.Service
-  );
-  services.sort(byName);
-  return services;
-};
+const App = () => {
+  const classes = useStyles();
+  const [opens, setOpens] = useState<{ [k: string]: boolean }>({});
+  const handleClick = (key: string) =>
+    setOpens({ ...opens, [key]: !opens[key] });
 
-const messages = (namespace: protobuf.Namespace): protobuf.Type[] => {
-  const messages = namespace.nestedArray.filter(
-    (o): o is protobuf.Type => o instanceof protobuf.Type
-  );
-  messages.sort(byName);
-  return messages;
-};
-
-const enums = (namespace: protobuf.Namespace): protobuf.Enum[] => {
-  const enums = namespace.nestedArray.filter(
-    (o): o is protobuf.Enum => o instanceof protobuf.Enum
-  );
-  enums.sort(byName);
-  return enums;
-};
-
-const App: React.FC = () => {
   return (
-    <div className="App">
-      {sdk &&
-        sdk.nestedArray.map(namespace => (
-          <div key={`ninety_nine.sdk.${namespace.name}`}>
-            <h1>{namespace.name}</h1>
-            <h2>Services</h2>
-            {services(namespace as protobuf.Namespace).map(
-              ({ name, methods }) => (
-                <div>
-                  <div>
-                    {name} {}
-                  </div>
-                  <ol>
-                    {Object.keys(methods).map(name => (
-                      <div>{name}</div>
-                    ))}
-                  </ol>
-                </div>
-              )
-            )}
-            <h2>Messages</h2>
-            {messages(namespace as protobuf.Namespace).map(
-              ({ name, ...value }) => (
-                <div>{name}</div>
-              )
-            )}
-            <h2>Enums</h2>
-            {enums(namespace as protobuf.Namespace).map(
-              ({ name, ...value }) => (
-                <div>{name}</div>
-              )
-            )}
-          </div>
+    <div>
+      <CssBaseline />
+      <List className={classes.root}>
+        {namespaces(sdk).map(ns => (
+          <React.Fragment key={`ninety_nine.sdk.${ns.name}`}>
+            <ListItem button onClick={() => handleClick(ns.name)}>
+              <ListItemText primary={ns.name} />
+            </ListItem>
+            <Collapse in={opens[ns.name]}>
+              <List>
+                {services(ns).map(srv => (
+                  <ListItem
+                    button
+                    key={`ninety_nine.sdk.${ns.name}.${srv.name}`}
+                    className={classes.nested}
+                  >
+                    <ListItemText primary={srv.name} />
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
+          </React.Fragment>
         ))}
+      </List>
     </div>
   );
 };
