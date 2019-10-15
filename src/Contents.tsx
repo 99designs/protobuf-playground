@@ -6,6 +6,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import { namespaces, services } from './proto';
 import ProtoContext from './ProtoContext';
 import { Link } from 'react-router-dom';
@@ -34,6 +36,7 @@ const Contents = () => {
         <React.Fragment key={`ninety_nine.sdk.${ns.name}`}>
           <ListItem button onClick={() => handleClick(ns.name)}>
             <ListItemText primary={ns.name} />
+            {opens[ns.name] ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
           <Collapse in={opens[ns.name]}>
             <List>
