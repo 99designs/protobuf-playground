@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Collapse from '@material-ui/core/Collapse';
-import root, { namespaces, services } from './proto';
-import protobuf from 'protobufjs';
-
-const sdk = root.lookup('ninety_nine.sdk') as protobuf.Namespace;
+import { namespaces, services } from './proto';
+import ProtoContext from './ProtoContext';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,6 +24,8 @@ const Contents = () => {
   const [opens, setOpens] = useState<{ [k: string]: boolean }>({});
   const handleClick = (key: string) =>
     setOpens({ ...opens, [key]: !opens[key] });
+  const { root, selected } = useContext(ProtoContext);
+  const sdk = root.lookup('ninety_nine.sdk') as protobuf.Namespace;
 
   return (
     <List className={classes.root}>
@@ -40,6 +42,13 @@ const Contents = () => {
                   button
                   key={`ninety_nine.sdk.${ns.name}.${srv.name}`}
                   className={classes.nested}
+                  selected={selected === srv}
+                  component={props => (
+                    <Link
+                      to={`/ninety_nine.sdk.${ns.name}.${srv.name}`}
+                      {...props}
+                    />
+                  )}
                 >
                   <ListItemText primary={srv.name} />
                 </ListItem>
