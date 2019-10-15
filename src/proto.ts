@@ -42,6 +42,12 @@ export const enums = (namespace: protobuf.Namespace): protobuf.Enum[] => {
   return enums;
 };
 
+export const methods = (srv: protobuf.Service): protobuf.Method[] => {
+  const methods = [...srv.methodsArray];
+  methods.sort(byName);
+  return methods;
+};
+
 // Add global reference to window for easier debugging.
 declare global {
   interface Window {
