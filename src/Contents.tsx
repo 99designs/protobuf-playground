@@ -1,15 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import Collapse from '@material-ui/core/Collapse';
 import { namespaces, services, methods } from './proto';
 import ProtoContext from './ProtoContext';
-import { Link } from 'react-router-dom';
+import ContentsItem from './ContentsItem';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,52 +20,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ContentsItem: React.FC<{
-  startOpen: boolean;
-  href?: string;
-  title: string;
-  children?: React.ReactNode;
-  depth: number;
-  classes?: { [k: string]: string };
-}> = ({ startOpen, href, title, children, depth, classes }) => {
-  const [open, setOpen] = useState(startOpen);
-  const handleClick = () => {
-    setOpen(open => !open);
-  };
-
-  const style = {
-    paddingLeft: 8 * (3 + 2 * depth),
-  };
-
-  if (href) {
-    return (
-      <ListItem
-        key={title}
-        button
-        component={props => <Link to={href} {...props} />}
-        style={style}
-      >
-        <ListItemText primary={title} classes={classes} />
-      </ListItem>
-    );
-  }
-
-  return (
-    <>
-      <ListItem button style={style} onClick={handleClick}>
-        <ListItemText primary={title} classes={classes} />
-      </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        {children}
-      </Collapse>
-    </>
-  );
-};
-
 const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
   ns,
   depth = 0,
 }) => {
+  const { selected } = useContext(ProtoContext);
   const classes = useStyles();
   return (
     <>
@@ -78,7 +34,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
           title={ns.name}
           key={ns.fullName}
           depth={depth}
-          classes={{ primary: classes.namespace }}
+          classes={{ text: classes.namespace }}
         >
           {services(ns).map(srv => (
             <ContentsItem
@@ -86,7 +42,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
               title={srv.name}
               key={srv.fullName}
               depth={depth + 1}
-              classes={{ primary: classes.service }}
+              classes={{ text: classes.service }}
             >
               {methods(srv).map(method => (
                 <ContentsItem
@@ -95,6 +51,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
                   href={`/${method.fullName}`}
                   key={method.fullName}
                   depth={depth + 2}
+                  selected={selected === method}
                 />
               ))}
             </ContentsItem>
@@ -107,7 +64,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
 
 const Contents: React.FC = () => {
   const classes = useStyles();
-  const { root, selected } = useContext(ProtoContext);
+  const { root } = useContext(ProtoContext);
   const sdk = root.lookup('ninety_nine.sdk') as protobuf.Namespace;
 
   return (
