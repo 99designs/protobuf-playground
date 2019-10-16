@@ -52,17 +52,15 @@ export const parentOf = (
   parent: protobuf.ReflectionObject,
   child: protobuf.ReflectionObject | null
 ): boolean => {
-  if (child === null) {
-    return false;
-  }
-  if (child.parent === parent) {
-    return true;
-  }
-  if (child.parent === null || child.parent instanceof protobuf.Root) {
-    return false;
-  }
-  return parentOf(parent, child.parent);
+  return child ? heirarchy(child).includes(parent) : false;
 };
+
+export const heirarchy = (
+  obj: protobuf.ReflectionObject
+): protobuf.ReflectionObject[] =>
+  obj.parent === null || obj.parent instanceof protobuf.Root
+    ? [obj]
+    : [...heirarchy(obj.parent), obj];
 
 // Add global reference to window for easier debugging.
 declare global {

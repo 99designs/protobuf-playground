@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import { Link } from 'react-router-dom';
+import { ForwardedRouterLink as Link } from './Link';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,7 +44,7 @@ const ContentsItem: React.FC<{
       <ListItem
         key={title}
         button
-        component={props => <Link to={href} {...props} />}
+        component={Link}
         style={style}
         className={classes.root}
         classes={{
@@ -53,6 +53,7 @@ const ContentsItem: React.FC<{
         }}
         selected={selected}
         disableTouchRipple
+        to={href}
       >
         <ListItemText
           primary={title}
