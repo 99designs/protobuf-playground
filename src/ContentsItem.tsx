@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
+import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 import { Link } from 'react-router-dom';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {},
   text: {},
-});
+  selected: {
+    backgroundColor: 'transparent !important',
+    color: theme.palette.primary.main,
+  },
+  selectedText: {
+    fontWeight: theme.typography.fontWeightMedium,
+  },
+}));
 
 const ContentsItem: React.FC<{
   startOpen: boolean;
@@ -37,9 +45,16 @@ const ContentsItem: React.FC<{
         component={props => <Link to={href} {...props} />}
         style={style}
         className={classes.root}
+        classes={{ selected: classes.selected }}
         selected={selected}
+        disableTouchRipple
       >
-        <ListItemText primary={title} classes={{ primary: classes.text }} />
+        <ListItemText
+          primary={title}
+          classes={{
+            primary: clsx(classes.text, { [classes.selectedText]: selected }),
+          }}
+        />
       </ListItem>
     );
   }
