@@ -7,14 +7,16 @@ import Collapse from '@material-ui/core/Collapse';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
-  root: {},
-  text: {},
-  selected: {
-    backgroundColor: 'transparent !important',
-    color: theme.palette.primary.main,
+  root: {
+    '&$selected': {
+      backgroundColor: 'transparent',
+    },
   },
+  text: {},
+  selected: {},
   selectedText: {
     fontWeight: theme.typography.fontWeightMedium,
+    color: theme.palette.primary.main,
   },
 }));
 
@@ -45,7 +47,10 @@ const ContentsItem: React.FC<{
         component={props => <Link to={href} {...props} />}
         style={style}
         className={classes.root}
-        classes={{ selected: classes.selected }}
+        classes={{
+          root: classes.root,
+          selected: classes.selected,
+        }}
         selected={selected}
         disableTouchRipple
       >
