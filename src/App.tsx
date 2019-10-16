@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, BrowserRouter } from 'react-router-dom';
 import AppFrame from './AppFrame';
 import root from './proto';
 import ProtoContext from './ProtoContext';
 
 const App = () => {
+  const [, setResolved] = useState(false);
   useEffect(() => {
     // Assume that the imported root is complete and will validate.
     // This resolved references to actual type objects rather than just strings.
     root.resolveAll();
+    setResolved(true);
   });
   return (
     <BrowserRouter>

@@ -8,16 +8,19 @@ import Box from '@material-ui/core/Box';
 import Forward from '@material-ui/icons/Forward';
 import Reply from '@material-ui/icons/Reply';
 import Link from './Link';
+import MessageTable from './MessageTable';
 
 const MethodContext: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   return (
     <div>
       <Breadcrumbs>
-        {heirarchy(method).map(obj => (
-          <Link to={`/${obj.fullName}`} key={obj.fullName}>
-            {obj.name}
-          </Link>
-        ))}
+        {method.parent &&
+          heirarchy(method.parent).map(obj => (
+            <Link to={`/${obj.fullName}`} key={obj.fullName} color="inherit">
+              {obj.name}
+            </Link>
+          ))}
+        <Typography color="textPrimary">{method.name}</Typography>
       </Breadcrumbs>
 
       <Box m={4} />
@@ -32,10 +35,12 @@ const MethodContext: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       <Typography variant="h5" gutterBottom>
         <Forward /> {method.requestType}
       </Typography>
+      <MessageTable message={method.resolvedRequestType} />
 
       <Typography variant="h5" gutterBottom>
         <Reply /> {method.responseType}
       </Typography>
+      <MessageTable message={method.resolvedResponseType} />
     </div>
   );
 };
