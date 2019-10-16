@@ -48,6 +48,22 @@ export const methods = (srv: protobuf.Service): protobuf.Method[] => {
   return methods;
 };
 
+export const parentOf = (
+  parent: protobuf.ReflectionObject,
+  child: protobuf.ReflectionObject | null
+): boolean => {
+  if (child === null) {
+    return false;
+  }
+  if (child.parent === parent) {
+    return true;
+  }
+  if (child.parent === null || child.parent instanceof protobuf.Root) {
+    return false;
+  }
+  return parentOf(parent, child.parent);
+};
+
 // Add global reference to window for easier debugging.
 declare global {
   interface Window {

@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ContentsItem: React.FC<{
-  startOpen: boolean;
+  startOpen?: boolean;
   href?: string;
   title: string;
   children?: React.ReactNode;

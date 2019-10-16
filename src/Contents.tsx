@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import { namespaces, services, methods } from './proto';
+import { namespaces, services, methods, parentOf } from './proto';
 import ProtoContext from './ProtoContext';
 import ContentsItem from './ContentsItem';
 
@@ -30,7 +30,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
     <>
       {namespaces(ns).map(ns => (
         <ContentsItem
-          startOpen={false}
+          startOpen={parentOf(ns, selected)}
           title={ns.name}
           key={ns.fullName}
           depth={depth}
@@ -38,7 +38,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
         >
           {services(ns).map(srv => (
             <ContentsItem
-              startOpen={false}
+              startOpen={parentOf(srv, selected)}
               title={srv.name}
               key={srv.fullName}
               depth={depth + 1}
@@ -46,7 +46,6 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
             >
               {methods(srv).map(method => (
                 <ContentsItem
-                  startOpen={false}
                   title={method.name}
                   href={`/${method.fullName}`}
                   key={method.fullName}
