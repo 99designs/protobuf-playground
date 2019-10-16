@@ -1,27 +1,17 @@
 import React from 'react';
 import protobuf from 'protobufjs';
-import { heirarchy } from './proto';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
 import Forward from '@material-ui/icons/Forward';
 import Reply from '@material-ui/icons/Reply';
-import Link from './Link';
 import MessageTable from './MessageTable';
+import Breadcrumbs from './Breadcrumbs';
 
-const MethodContext: React.FC<{ method: protobuf.Method }> = ({ method }) => {
+const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   return (
     <div>
-      <Breadcrumbs>
-        {method.parent &&
-          heirarchy(method.parent).map(obj => (
-            <Link to={`/${obj.fullName}`} key={obj.fullName} color="inherit">
-              {obj.name}
-            </Link>
-          ))}
-        <Typography color="textPrimary">{method.name}</Typography>
-      </Breadcrumbs>
+      <Breadcrumbs object={method} />
 
       <Box m={4} />
 
@@ -45,4 +35,4 @@ const MethodContext: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   );
 };
 
-export default MethodContext;
+export default MethodContent;

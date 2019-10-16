@@ -11,7 +11,7 @@ const App = () => {
     // This resolved references to actual type objects rather than just strings.
     root.resolveAll();
     setResolved(true);
-  });
+  }, []);
   return (
     <BrowserRouter>
       <Route path="/:object">

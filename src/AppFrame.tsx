@@ -6,6 +6,7 @@ import Contents from './Contents';
 import ProtoContext from './ProtoContext';
 import protobuf from 'protobufjs';
 import MethodContent from './MethodContent';
+import MessageContent from './MessageContent';
 
 const drawerWidth = 300;
 
@@ -42,6 +43,9 @@ const AppFrame = () => {
       <main className={classes.content}>
         {selected && selected instanceof protobuf.Method && (
           <MethodContent method={selected} />
+        )}
+        {selected && selected instanceof protobuf.Type && (
+          <MessageContent message={selected} />
         )}
       </main>
     </div>
