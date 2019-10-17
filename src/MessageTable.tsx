@@ -17,13 +17,13 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(4),
   },
   fieldHeader: {
-    minWidth: '30%',
+    // minWidth: '30%',
   },
   cellNested: {
     padding: 0,
   },
   typeHeader: {
-    minWidth: '20%',
+    // minWidth: '20%',
   },
   repeated: {
     fontWeight: theme.typography.fontWeightMedium,
@@ -32,16 +32,57 @@ const useStyles = makeStyles(theme => ({
 
 const MessageTableInner: React.FC<{
   message: protobuf.Type;
-  headless?: boolean;
   depth?: number;
-}> = ({ message, headless, depth = 0 }) => {
+}> = ({ message, depth = 0 }) => {
   const classes = useStyles();
   const style = {
-    paddingLeft: 16 * (1 + depth),
+    paddingLeft: 16 * (1 + 2 * depth),
   };
   return (
-    <Table>
-      {!headless && (
+    <>
+      {message.fieldsArray.map(field => (
+        <React.Fragment key={`${message.fullName}.${field.name}`}>
+          <TableRow>
+            <TableCell className={classes.fieldHeader} style={style}>
+              {field.name}
+            </TableCell>
+            <TableCell className={classes.typeHeader}>
+              {field.resolvedType ? (
+                <Link to={`/${field.resolvedType.fullName}`}>
+                  {field.resolvedType.name}
+                </Link>
+              ) : (
+                field.type
+              )}
+              {field.repeated && (
+                <>
+                  {' '}
+                  <Chip label="repeated" size="small" />
+                </>
+              )}
+            </TableCell>
+            <TableCell>{field.comment}</TableCell>
+          </TableRow>
+          {field.resolvedType &&
+            field.resolvedType instanceof protobuf.Type && (
+              <MessageTableInner
+                message={field.resolvedType}
+                depth={depth + 1}
+              />
+            )}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+const MessageTable: React.FC<{
+  message: protobuf.Type;
+}> = ({ message }) => {
+  const classes = useStyles();
+  return (
+    <Paper className={classes.root}>
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>Field</TableCell>
@@ -49,56 +90,10 @@ const MessageTableInner: React.FC<{
             <TableCell>Description</TableCell>
           </TableRow>
         </TableHead>
-      )}
-      <TableBody>
-        {message.fieldsArray.map(field => (
-          <React.Fragment key={`${message.fullName}.${field.name}`}>
-            <TableRow>
-              <TableCell className={classes.fieldHeader} style={style}>
-                {field.name}
-              </TableCell>
-              <TableCell className={classes.typeHeader}>
-                {field.repeated && (
-                  <>
-                    <Chip label="repeated" size="small" />{' '}
-                  </>
-                )}
-                {field.resolvedType ? (
-                  <Link to={`/${field.resolvedType.fullName}`}>
-                    {field.resolvedType.name}
-                  </Link>
-                ) : (
-                  field.type
-                )}
-              </TableCell>
-              <TableCell>{field.comment}</TableCell>
-            </TableRow>
-            {field.resolvedType && field.resolvedType instanceof protobuf.Type && (
-              <TableRow>
-                <TableCell colSpan={3} className={classes.cellNested}>
-                  <MessageTableInner
-                    message={field.resolvedType}
-                    headless
-                    depth={depth + 1}
-                  />
-                </TableCell>
-              </TableRow>
-            )}
-          </React.Fragment>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
-
-const MessageTable: React.FC<{
-  message: protobuf.Type;
-  headless?: boolean;
-}> = props => {
-  const classes = useStyles();
-  return (
-    <Paper className={classes.root}>
-      <MessageTableInner {...props} />
+        <TableBody>
+          <MessageTableInner message={message} />
+        </TableBody>
+      </Table>
     </Paper>
   );
 };
