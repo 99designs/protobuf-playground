@@ -7,6 +7,8 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import { namespaces, services, methods, parentOf } from './proto';
 import ProtoContext from './ProtoContext';
 import ContentsItem from './ContentsItem';
+import Folder from '@material-ui/icons/Folder';
+import Settings from '@material-ui/icons/Settings';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,6 +37,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
           key={ns.fullName}
           depth={depth}
           classes={{ text: classes.namespace }}
+          icon={<Folder fontSize="inherit" />}
         >
           {services(ns).map(srv => (
             <ContentsItem
@@ -43,6 +46,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
               key={srv.fullName}
               depth={depth + 1}
               classes={{ text: classes.service }}
+              icon={<Settings fontSize="inherit" />}
             >
               {methods(srv).map(method => (
                 <ContentsItem

@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Chip from '@material-ui/core/Chip';
 import Link from './Link';
 import Paper from '@material-ui/core/Paper';
-import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -55,7 +54,9 @@ const MessageTable: React.FC<{ message: protobuf.Type | null }> = ({
               </TableCell>
               <TableCell className={classes.typeHeader}>
                 {field.repeated && (
-                  <span className={classes.repeated}>repeated </span>
+                  <>
+                    <Chip label="repeated" size="small" />{' '}
+                  </>
                 )}
                 {field.resolvedType ? (
                   <Link to={`/${field.resolvedType.fullName}`}>
