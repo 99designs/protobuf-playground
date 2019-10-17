@@ -25,12 +25,16 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       <Typography variant="h5" gutterBottom>
         <Forward /> {method.requestType}
       </Typography>
-      <MessageTable message={method.resolvedRequestType} />
+      {method.resolvedRequestType && (
+        <MessageTable message={method.resolvedRequestType} />
+      )}
 
       <Typography variant="h5" gutterBottom>
         <Reply /> {method.responseType}
       </Typography>
-      <MessageTable message={method.resolvedResponseType} />
+      {method.resolvedResponseType && (
+        <MessageTable message={method.resolvedResponseType} />
+      )}
     </div>
   );
 };

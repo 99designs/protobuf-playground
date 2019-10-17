@@ -17,28 +17,31 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(4),
   },
   fieldHeader: {
-    width: '30%',
+    minWidth: '30%',
+  },
+  cellNested: {
+    padding: 0,
   },
   typeHeader: {
-    width: '20%',
+    minWidth: '20%',
   },
   repeated: {
     fontWeight: theme.typography.fontWeightMedium,
   },
 }));
 
-const MessageTable: React.FC<{ message: protobuf.Type | null }> = ({
-  message,
-}) => {
+const MessageTableInner: React.FC<{
+  message: protobuf.Type;
+  headless?: boolean;
+  depth?: number;
+}> = ({ message, headless, depth = 0 }) => {
   const classes = useStyles();
-
-  if (message === null) {
-    return null;
-  }
-
+  const style = {
+    paddingLeft: 16 * (1 + depth),
+  };
   return (
-    <Paper className={classes.root}>
-      <Table>
+    <Table>
+      {!headless && (
         <TableHead>
           <TableRow>
             <TableCell>Field</TableCell>
@@ -46,10 +49,12 @@ const MessageTable: React.FC<{ message: protobuf.Type | null }> = ({
             <TableCell>Description</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {message.fieldsArray.map(field => (
+      )}
+      <TableBody>
+        {message.fieldsArray.map(field => (
+          <React.Fragment key={`${message.fullName}.${field.name}`}>
             <TableRow>
-              <TableCell className={classes.fieldHeader}>
+              <TableCell className={classes.fieldHeader} style={style}>
                 {field.name}
               </TableCell>
               <TableCell className={classes.typeHeader}>
@@ -68,9 +73,32 @@ const MessageTable: React.FC<{ message: protobuf.Type | null }> = ({
               </TableCell>
               <TableCell>{field.comment}</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+            {field.resolvedType && field.resolvedType instanceof protobuf.Type && (
+              <TableRow>
+                <TableCell colSpan={3} className={classes.cellNested}>
+                  <MessageTableInner
+                    message={field.resolvedType}
+                    headless
+                    depth={depth + 1}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+          </React.Fragment>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+const MessageTable: React.FC<{
+  message: protobuf.Type;
+  headless?: boolean;
+}> = props => {
+  const classes = useStyles();
+  return (
+    <Paper className={classes.root}>
+      <MessageTableInner {...props} />
     </Paper>
   );
 };
