@@ -22,6 +22,8 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       <Divider />
       <Box m={2} />
 
+      {method.comment && <Typography paragraph>{method.comment}</Typography>}
+
       <Typography variant="h5" gutterBottom>
         <Forward /> {method.requestType}
       </Typography>

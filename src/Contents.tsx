@@ -68,6 +68,8 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
 const Contents: React.FC = () => {
   const classes = useStyles();
   const { root } = useContext(ProtoContext);
+  // FIXME make this work generically for all namespaces.
+  // Possibly collapse namespaces with only a single child down.
   const sdk = root.lookup('ninety_nine.sdk') as protobuf.Namespace;
 
   return (
