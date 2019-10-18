@@ -1,24 +1,22 @@
 const protobufjs = require('protobufjs');
 const fs = require('fs');
-const request = require('request-promise');
+const path = require('@protobufjs/path');
 
-const walker = predicate => {
-  const walk = (dir, files = []) => {
-    fs.readdirSync(dir).forEach(file => {
-      const path = dir + file;
-      if (fs.statSync(path).isDirectory()) {
-        walk(path + '/', files);
-      } else if (predicate(path)) {
-        files.push(path);
-      }
-    });
-    return files;
-  };
-  return walk;
+const walk = (dir, files = []) => {
+  fs.readdirSync(dir).forEach(file => {
+    const path = dir + file;
+    if (fs.statSync(path).isDirectory()) {
+      walk(path + '/', files);
+    } else if (path.endsWith('.proto')) {
+      files.push(path);
+    }
+  });
+  return files;
 };
 
-const protoWalk = walker(file => file.endsWith('.proto'));
-const sources = protoWalk('../proto/');
+process.chdir('../proto');
+
+const sources = walk('./');
 
 const parseOptions = {
   keepCase: true,
@@ -26,39 +24,31 @@ const parseOptions = {
 };
 
 const root = new protobufjs.Root();
+root.resolvePath = (origin, include) => {
+  if (include.startsWith('./')) {
+    include = include.substr(2);
+  }
 
-sources.forEach(path => {
-  source = fs.readFileSync(path);
-  protobufjs.parse(source, root, parseOptions);
-  console.log('adding:', path);
-});
+  // FIXME this will currently only handle google imports gracefully.
+  if (include.startsWith('google/')) {
+    console.log('📦', include);
+    return path.resolve(
+      origin,
+      'https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/' +
+        include
+    );
+  }
 
-// TODO extract these external dependencies from source files somehow
-const extern = [
-  'google/protobuf/field_mask.proto',
-  'google/protobuf/struct.proto',
-  'google/protobuf/timestamp.proto',
-  'google/protobuf/wrappers.proto',
-];
+  console.log('📂', include);
+  return path.resolve(origin, include);
+};
 
-const requests = extern.map(path => {
-  const url =
-    'https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/' +
-    path;
-  return request(url, (error, _, source) => {
-    if (error) {
-      console.error(error);
-      process.exit(1);
-    }
-    protobufjs.parse(source, root, parseOptions);
-    console.log('external:', path);
-  });
-});
+root.loadSync(sources, parseOptions);
 
-Promise.all(requests).then(() => {
-  fs.writeFileSync(
-    'src/proto.json',
-    JSON.stringify(root.toJSON({ keepComments: true }))
-  );
-  console.log('wrote: src/proto.json');
-});
+// TODO possibly consider serialising filenames alongside root JSON?
+// The JSON descriptor format does not include support for filenames, so it would need to be a side channel.
+// e.g. { root: JSON.stringify(root), filenames: {} }
+const json = root.toJSON({ keepComments: true });
+process.chdir('../playground');
+fs.writeFileSync('../playground/src/proto.json', JSON.stringify(json));
+console.log('💾 src/proto.json');
