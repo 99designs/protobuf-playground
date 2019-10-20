@@ -9,6 +9,7 @@ import MessageTable from './MessageTable';
 import Breadcrumbs from './Breadcrumbs';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Playground from './Playground';
 
 const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const [tab, setTab] = useState(0);
@@ -51,7 +52,11 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
           )}
         </>
       )}
-      {tab === 1 && <></>}
+      {tab === 1 && (
+        <>
+          <Playground method={method} />
+        </>
+      )}
     </div>
   );
 };

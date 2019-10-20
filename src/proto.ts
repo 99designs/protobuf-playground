@@ -62,6 +62,40 @@ export const heirarchy = (
     ? [obj]
     : [...heirarchy(obj.parent), obj];
 
+const emptyValueFor = (type: string | protobuf.Type): any => {};
+
+// Produces a JSON object that is a template for a given message.
+export const jsonTemplate = (message: protobuf.Type): any => {
+  const tmpl: any = {};
+  message.fieldsArray.forEach(field => {
+    // TODO better handling of repeated template - should probably fill out 1 value.
+    if (field.repeated) {
+      tmpl[field.name] = [];
+      return;
+    }
+    if (
+      field.resolvedType !== null &&
+      field.resolvedType instanceof protobuf.Type
+    ) {
+      tmpl[field.name] = jsonTemplate(field.resolvedType);
+      return;
+    }
+    switch (field.type) {
+      case 'int32':
+      case 'int64':
+        tmpl[field.name] = 0;
+        break;
+      case 'string':
+        tmpl[field.name] = '';
+        break;
+      default:
+        console.error('unknown type:', field.type);
+        break;
+    }
+  });
+  return tmpl;
+};
+
 // Add global reference to window for easier debugging.
 declare global {
   interface Window {
