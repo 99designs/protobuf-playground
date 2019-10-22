@@ -33,7 +33,7 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
         <Tab label="Playground" />
       </Tabs>
       <Divider />
-      <Box m={4} />
+      <Box m={2} />
 
       {tab === 0 && (
         <>

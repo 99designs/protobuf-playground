@@ -1,10 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import protobuf from 'protobufjs';
 import Button from '@material-ui/core/Button';
 import { jsonTemplate } from './proto';
+import CodeMirror from 'codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/monokai.css';
+import 'codemirror/mode/javascript/javascript';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+  editor: {
+    marginBottom: theme.spacing(2),
+    '& .CodeMirror': {
+      fontSize: '16px',
+      fontFamily: 'Monaco',
+    },
+  },
+}));
 
 const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
-  const [request, setRequest] = useState<protobuf.Message | null>(null);
+  const cm = useRef<CodeMirror.EditorFromTextArea>();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (
       method.resolvedRequestType === null ||
@@ -12,16 +28,27 @@ const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
     ) {
       throw new Error('Method types must be resolved');
     }
+    if (textareaRef.current == null) {
+      throw new Error('No');
+    }
     const json = jsonTemplate(method.resolvedRequestType);
-    setRequest(method.resolvedRequestType.create(json));
+    cm.current = CodeMirror.fromTextArea(textareaRef.current, {
+      mode: 'javascript',
+      theme: 'monokai',
+    });
+    cm.current.setValue(JSON.stringify(json, null, 2));
+    return () => {
+      if (cm.current) {
+        cm.current.toTextArea();
+      }
+    };
   }, [method]);
-  const handleChange = () => {};
+  const classes = useStyles();
   return (
     <>
-      <textarea
-        value={JSON.stringify(request, null, 2)}
-        onChange={handleChange}
-      />
+      <div className={classes.editor}>
+        <textarea ref={textareaRef} />
+      </div>
       <Button variant="contained" color="primary">
         Run Method
       </Button>
