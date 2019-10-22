@@ -1,6 +1,17 @@
 const protobufjs = require('protobufjs');
 const fs = require('fs');
-const path = require('@protobufjs/path');
+const path = require('path');
+
+let [rootPath, outFile = 'src/proto.json'] = process.argv.slice(2);
+if (rootPath === undefined) {
+  console.info('usage: generate.js proto-path');
+  process.exit(1);
+}
+rootPath = path.resolve(rootPath);
+if (!fs.existsSync(rootPath) || !fs.statSync(rootPath).isDirectory()) {
+  console.error(`${rootPath}: no such directory exists`);
+  process.exit(1);
+}
 
 const walk = (dir, files = []) => {
   fs.readdirSync(dir).forEach(file => {
@@ -13,10 +24,7 @@ const walk = (dir, files = []) => {
   });
   return files;
 };
-
-process.chdir('../proto');
-
-const sources = walk('./');
+const sources = walk(rootPath + '/');
 
 const parseOptions = {
   keepCase: true,
@@ -25,22 +33,22 @@ const parseOptions = {
 
 const root = new protobufjs.Root();
 root.resolvePath = (origin, include) => {
-  if (include.startsWith('./')) {
-    include = include.substr(2);
-  }
-
-  // FIXME this will currently only handle google imports gracefully.
-  if (include.startsWith('google/')) {
+  // FIXME this is not a great way to handle runtime proto definitions.  It works, but probably should rely on
+  // definitions shipped with protobuf.js
+  if (include.startsWith('google/protobuf/')) {
     console.log('📦', include);
-    return path.resolve(
-      origin,
+    return (
       'https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/' +
-        include
+      include
     );
   }
 
-  console.log('📂', include);
-  return path.resolve(origin, include);
+  if (!fs.existsSync(include)) {
+    include = rootPath + '/' + include;
+  }
+
+  console.log('📂', path.relative(rootPath, include));
+  return include;
 };
 
 root.loadSync(sources, parseOptions);
@@ -49,6 +57,5 @@ root.loadSync(sources, parseOptions);
 // The JSON descriptor format does not include support for filenames, so it would need to be a side channel.
 // e.g. { root: JSON.stringify(root), filenames: {} }
 const json = root.toJSON({ keepComments: true });
-process.chdir('../playground');
-fs.writeFileSync('../playground/src/proto.json', JSON.stringify(json));
-console.log('💾 src/proto.json');
+fs.writeFileSync(outFile, JSON.stringify(json));
+console.log('💾', outFile);
