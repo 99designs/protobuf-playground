@@ -6,6 +6,8 @@ import CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/monokai.css';
 import 'codemirror/mode/javascript/javascript';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -17,6 +19,32 @@ const useStyles = makeStyles(theme => ({
     },
   },
 }));
+
+CodeMirror.registerHelper(
+  'hint',
+  'javascript',
+  (cm: CodeMirror.Editor, options: { type: protobuf.Type }) => {
+    const cur = cm.getCursor();
+    const token = cm.getTokenAt(cur);
+    let match = token.string;
+    let start = token.start;
+    while (match.charAt(0) == '"') {
+      match = match.substr(1);
+      start++;
+    }
+    const list = options.type.fieldsArray
+      .filter(field => field.name.startsWith(match))
+      .map(field => field.name);
+    console.log(match, list);
+    if (list.length) {
+      return {
+        list,
+        from: { line: cur.line, column: start },
+        to: { line: cur.line, column: token.end },
+      };
+    }
+  }
+);
 
 const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const cm = useRef<CodeMirror.EditorFromTextArea>();
@@ -31,12 +59,29 @@ const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
     if (textareaRef.current == null) {
       throw new Error('No');
     }
-    const json = jsonTemplate(method.resolvedRequestType);
     cm.current = CodeMirror.fromTextArea(textareaRef.current, {
       mode: 'javascript',
       theme: 'monokai',
+      hintOptions: {
+        type: method.resolvedRequestType,
+        completeSingle: true,
+      },
     });
-    cm.current.setValue(JSON.stringify(json, null, 2));
+
+    cm.current.setValue(
+      JSON.stringify(jsonTemplate(method.resolvedRequestType), null, 2)
+    );
+    cm.current.on('keyup', (cm: CodeMirror.Editor, event) => {
+      const code = event.keyCode;
+      if (
+        (code >= 65 && code <= 90) || // letters
+        (!event.shiftKey && code >= 48 && code <= 57) || // numbers
+        (event.shiftKey && code === 189) || // underscore
+        (event.shiftKey && code === 222) // "
+      ) {
+        cm.execCommand('autocomplete');
+      }
+    });
     return () => {
       if (cm.current) {
         cm.current.toTextArea();
