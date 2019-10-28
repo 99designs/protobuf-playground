@@ -25,7 +25,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate": "node generate.js ../sdk/proto src/proto.js"
+    "generate": "node generate.js"
   },
   "eslintConfig": {
     "extends": "react-app"

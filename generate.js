@@ -53,6 +53,13 @@ root.resolvePath = (origin, include) => {
 
 root.loadSync(sources, parseOptions);
 
+try {
+  root.resolveAll();
+} catch (err) {
+  console.error(`fatal: could not resolve root: ${err}`);
+  process.exit(1);
+}
+
 // TODO possibly consider serialising filenames alongside root JSON?
 // The JSON descriptor format does not include support for filenames, so it would need to be a side channel.
 // e.g. { root: JSON.stringify(root), filenames: {} }
