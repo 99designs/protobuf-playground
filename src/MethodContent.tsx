@@ -33,10 +33,11 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
         <Tab label="Playground" />
       </Tabs>
       <Divider />
-      <Box m={2} />
 
       {tab === 0 && (
         <>
+          <Box m={2} />
+
           <Typography variant="h6" gutterBottom>
             <Forward fontSize="inherit" /> {method.requestType}
           </Typography>

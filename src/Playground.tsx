@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import protobuf from 'protobufjs';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Toolbar from '@material-ui/core/Toolbar';
+import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
 import { jsonTemplate } from './proto';
 import CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -10,99 +12,32 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
 import { makeStyles } from '@material-ui/core/styles';
 import './Playground.css';
+import './codemirror';
+import twirp from './twirp';
+
+const twirpImpl = twirp('');
 
 const useStyles = makeStyles(theme => ({
-  editor: {
-    marginBottom: theme.spacing(2),
+  frame: {
+    display: 'flex',
+    width: '100%',
+    '& > div': {
+      width: '50%',
+    },
     '& .CodeMirror': {
       fontSize: '16px',
       fontFamily: 'Monaco, monospace',
     },
   },
+  editor: {},
+  response: {},
 }));
 
-const trimQuotes = /^"+|"+$/g;
-
-// Given a list of tokens and a proto type, return the type that corresponds to the location of the last token by
-// matching the JSON path to the type heirarchy.  Returns null if no match occurs.
-const resolveTokensToType = (
-  tokens: CodeMirror.Token[],
-  type: protobuf.Type
-): protobuf.Type | null => {
-  // Build up property path from tokens
-  const path: string[] = [];
-  let currentProperty: CodeMirror.Token | null = null;
-  tokens.forEach(token => {
-    if (token.type === 'string property') {
-      currentProperty = token;
-      return;
-    }
-    if (token.string === '{' && currentProperty) {
-      path.push(currentProperty.string.replace(trimQuotes, ''));
-      return;
-    }
-    if (token.string === '}') {
-      path.pop();
-      return;
-    }
-  });
-
-  // Resolve property path from array into final type
-  let currentType = type;
-
-  for (let i = 0; i < path.length; i++) {
-    const field = currentType.fields[path[i]];
-    if (!field || !(field.resolvedType instanceof protobuf.Type)) {
-      return null;
-    }
-    currentType = field.resolvedType;
-  }
-
-  return currentType;
-};
-
-CodeMirror.registerHelper(
-  'hint',
-  'javascript',
-  (cm: CodeMirror.Editor, options: { type: protobuf.Type }) => {
-    const cur = cm.getCursor();
-    const token = cm.getTokenAt(cur);
-    const match = token.string.replace(trimQuotes, '');
-
-    // Fetch all tokens up to the cursor
-    let tokens: CodeMirror.Token[] = [];
-    for (let i = 0; i < cur.line; i++) {
-      tokens = [...tokens, ...cm.getLineTokens(i)];
-    }
-    cm.getLineTokens(cur.line).forEach(token => {
-      if (token.end <= cur.ch) {
-        tokens.push(token);
-      }
-    });
-    const type = resolveTokensToType(tokens, options.type);
-    if (type === null) {
-      return;
-    }
-
-    const results = type.fieldsArray.filter(field =>
-      field.name.startsWith(match)
-    );
-    if (results.length) {
-      return {
-        list: results.map(field => ({
-          text: `"${field.name}": `,
-          displayText: field.name,
-        })),
-        from: CodeMirror.Pos(cur.line, token.start),
-        to: CodeMirror.Pos(cur.line, token.end),
-      };
-    }
-  }
-);
-
 const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
-  const cm = useRef<CodeMirror.EditorFromTextArea>();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorCm = useRef<CodeMirror.EditorFromTextArea>();
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const responseCm = useRef<CodeMirror.EditorFromTextArea>();
+  const responseRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (
       method.resolvedRequestType === null ||
@@ -110,10 +45,8 @@ const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
     ) {
       throw new Error('Method types must be resolved');
     }
-    if (textareaRef.current == null) {
-      throw new Error('No');
-    }
-    cm.current = CodeMirror.fromTextArea(textareaRef.current, {
+
+    editorCm.current = CodeMirror.fromTextArea(editorRef.current!, {
       mode: {
         name: 'javascript',
         json: true,
@@ -125,10 +58,11 @@ const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       },
     });
 
-    cm.current.setValue(
+    editorCm.current.setValue(
       JSON.stringify(jsonTemplate(method.resolvedRequestType), null, 2)
     );
-    cm.current.on('keyup', (cm: CodeMirror.Editor, event) => {
+
+    editorCm.current.on('keyup', (cm: CodeMirror.Editor, event) => {
       const code = event.keyCode;
       if (
         (code >= 65 && code <= 90) || // letters
@@ -139,21 +73,49 @@ const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
         cm.execCommand('autocomplete');
       }
     });
+
+    responseCm.current = CodeMirror.fromTextArea(responseRef.current!, {
+      mode: {
+        name: 'javascript',
+        json: true,
+      },
+      readOnly: true,
+      theme: 'monokai',
+    });
+
     return () => {
-      if (cm.current) {
-        cm.current.toTextArea();
-      }
+      if (editorCm.current) editorCm.current.toTextArea();
+      if (responseCm.current) responseCm.current.toTextArea();
     };
   }, [method]);
+
+  const handleExecute = () => {
+    // TODO improve type safety everywhere here
+    const srv = (method.parent as protobuf.Service).create(twirpImpl) as any;
+    const methodName =
+      method.name.charAt(0).toLowerCase() + method.name.slice(1);
+    const json = JSON.parse(editorCm.current!.getValue());
+    srv[methodName](json, (err: any, res: any) => {
+      responseCm.current!.setValue(JSON.stringify(res, null, 2));
+    });
+  };
+
   const classes = useStyles();
   return (
     <>
-      <div className={classes.editor}>
-        <textarea ref={textareaRef} />
+      <Toolbar disableGutters={true}>
+        <IconButton color="primary" onClick={handleExecute}>
+          <PlayCircleFilled />
+        </IconButton>
+      </Toolbar>
+      <div className={classes.frame}>
+        <div className={classes.editor}>
+          <textarea ref={editorRef} />
+        </div>
+        <div className={classes.response}>
+          <textarea ref={responseRef} />
+        </div>
       </div>
-      <Button variant="contained" color="primary">
-        Run Method
-      </Button>
     </>
   );
 };

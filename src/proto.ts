@@ -81,6 +81,7 @@ export const jsonTemplate = (message: protobuf.Type): any => {
     switch (field.type) {
       case 'int32':
       case 'int64':
+      case 'float':
         tmpl[field.name] = 0;
         break;
       case 'string':
