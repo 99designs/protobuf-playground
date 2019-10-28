@@ -22,7 +22,7 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
 
       <Box m={4} />
 
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         {method.name}
       </Typography>
 

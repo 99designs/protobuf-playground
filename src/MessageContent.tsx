@@ -13,7 +13,7 @@ const MessageContent: React.FC<{ message: protobuf.Type }> = ({ message }) => {
 
       <Box m={4} />
 
-      <Typography variant="h3" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         {message.name}
       </Typography>
 
