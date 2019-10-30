@@ -17,9 +17,7 @@ const useStyles = makeStyles(theme => ({
   namespace: {
     fontWeight: theme.typography.fontWeightMedium,
   },
-  service: {
-    fontWeight: theme.typography.fontWeightMedium,
-  },
+  service: {},
 }));
 
 const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
@@ -41,23 +39,14 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
         >
           {services(ns).map(srv => (
             <ContentsItem
-              startOpen={parentOf(srv, selected)}
               title={srv.name}
+              href={`/${srv.fullName}`}
               key={srv.fullName}
               depth={depth + 1}
               classes={{ text: classes.service }}
               icon={<Settings fontSize="inherit" />}
-            >
-              {methods(srv).map(method => (
-                <ContentsItem
-                  title={method.name}
-                  href={`/${method.fullName}`}
-                  key={method.fullName}
-                  depth={depth + 2}
-                  selected={selected === method}
-                />
-              ))}
-            </ContentsItem>
+              selected={selected === srv}
+            />
           ))}
         </ContentsItem>
       ))}
@@ -65,19 +54,33 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
   );
 };
 
+const hasSingleChild = (ns: protobuf.Namespace): boolean => {
+  return namespaces(ns).length == 1 && services(ns).length == 0;
+};
+
 const Contents: React.FC = () => {
   const classes = useStyles();
   const { root } = useContext(ProtoContext);
-  // FIXME make this work generically for all namespaces.
-  // Possibly collapse namespaces with only a single child down.
-  const sdk = root.lookup('ninety_nine.sdk') as protobuf.Namespace;
-
   return (
-    <List className={classes.root} dense={true}>
-      <ListSubheader>{sdk.fullName}</ListSubheader>
-      <Divider />
-      <Namespace ns={sdk} />
-    </List>
+    <>
+      {root.nestedArray.map(ns => {
+        if (ns instanceof protobuf.Namespace) {
+          if (hasSingleChild(ns)) {
+            ns = ns.nestedArray[0];
+          }
+        } else {
+          throw Error('Protobuf root should only contain namespaces');
+        }
+
+        return (
+          <List className={classes.root} dense={true} key={ns.fullName}>
+            <ListSubheader>{ns.fullName}</ListSubheader>
+            <Divider />
+            <Namespace ns={ns as protobuf.Namespace} />
+          </List>
+        );
+      })}
+    </>
   );
 };
 
