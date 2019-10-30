@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -29,6 +29,13 @@ const useStyles = makeStyles(theme => ({
 const AppFrame = () => {
   const classes = useStyles();
   const { selected } = useContext(ProtoContext);
+  useEffect(() => {
+    let title = 'Protobuf Playground';
+    if (selected) {
+      title = `${selected.name} — ${title}`;
+    }
+    document.title = title;
+  }, [selected]);
   return (
     <div className={classes.root}>
       <CssBaseline />
