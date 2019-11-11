@@ -38,6 +38,14 @@ const useStyles = makeStyles(theme => ({
   repeated: {
     fontWeight: theme.typography.fontWeightMedium,
   },
+  descriptionCell: {
+    '& p': {
+      margin: 0,
+    },
+    '& p + p': {
+      marginTop: theme.spacing(2),
+    },
+  },
 }));
 
 const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
@@ -59,10 +67,8 @@ const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
             </IconButton>
           )}
         </TableCell>
-        <TableCell className={classes.fieldHeader} style={style}>
-          {field.name}
-        </TableCell>
-        <TableCell className={classes.typeHeader}>
+        <TableCell style={style}>{field.name}</TableCell>
+        <TableCell>
           {field.resolvedType ? (
             <Link to={`/${fullName(field.resolvedType)}`}>
               {field.resolvedType.name}
@@ -77,7 +83,7 @@ const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
             </>
           )}
         </TableCell>
-        <TableCell className={classes.descriptionHeader}>
+        <TableCell className={classes.descriptionCell}>
           {field.comment && <Markdown>{field.comment}</Markdown>}
         </TableCell>
       </TableRow>
@@ -113,9 +119,11 @@ const MessageTable: React.FC<{
         <TableHead>
           <TableRow>
             <TableCell></TableCell>
-            <TableCell>Field</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Description</TableCell>
+            <TableCell className={classes.fieldHeader}>Field</TableCell>
+            <TableCell className={classes.typeHeader}>Type</TableCell>
+            <TableCell className={classes.descriptionHeader}>
+              Description
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
