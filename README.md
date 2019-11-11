@@ -12,7 +12,7 @@ npm run generate [path to protobuf file root]
 ```
 
 All protobuf file paths are resolved relative to the root path given.  Protobuf definitions must be complete in order to
-successfully generate the JSON output.  Output will be saved as `src/proto.json`.
+successfully generate the JSON output.  Output will be saved as `public/proto.json`.
 
 ```
 npm start

@@ -1,7 +1,4 @@
 import protobuf from 'protobufjs';
-import data from './proto.json';
-
-const root = protobuf.Root.fromJSON(data);
 
 const byName = (a: { name: string }, b: { name: string }) =>
   a.name.localeCompare(b.name);
@@ -99,13 +96,3 @@ export const jsonTemplate = (message: protobuf.Type): any => {
 export const fullName = (obj: protobuf.ReflectionObject): string => {
   return obj.fullName[0] === '.' ? obj.fullName.substr(1) : obj.fullName;
 };
-
-// Add global reference to window for easier debugging.
-declare global {
-  interface Window {
-    root: protobuf.Root;
-  }
-}
-window.root = root;
-
-export default root;

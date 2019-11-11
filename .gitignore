@@ -10,7 +10,7 @@
 
 # production
 /build
-/src/proto.json
+/public/proto.json
 
 # misc
 .DS_Store

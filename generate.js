@@ -2,7 +2,7 @@ const protobufjs = require('protobufjs');
 const fs = require('fs');
 const path = require('path');
 
-let [rootPath, outFile = 'src/proto.json'] = process.argv.slice(2);
+let [rootPath, outFile = 'public/proto.json'] = process.argv.slice(2);
 if (rootPath === undefined) {
   console.info('usage: generate.js proto-path');
   process.exit(1);
