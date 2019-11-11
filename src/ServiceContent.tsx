@@ -16,6 +16,9 @@ const useStyles = makeStyles(theme => ({
   content: {
     flexGrow: 1,
   },
+  messages: {
+    paddingLeft: theme.spacing(2),
+  },
 }));
 
 const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
@@ -43,26 +46,27 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
 
         {methods(service).map(method => (
           <>
-            <Divider />
-            <Box m={2} />
+            <Box m={8} />
 
             <Typography variant="h5" gutterBottom id={method.name}>
               {method.name}
             </Typography>
 
-            <Typography variant="h6" gutterBottom>
-              {method.requestType}
-            </Typography>
-            {method.resolvedRequestType && (
-              <MessageTable message={method.resolvedRequestType} />
-            )}
+            <div className={classes.messages}>
+              <Typography variant="h6" gutterBottom>
+                {method.requestType}
+              </Typography>
+              {method.resolvedRequestType && (
+                <MessageTable message={method.resolvedRequestType} />
+              )}
 
-            <Typography variant="h6" gutterBottom>
-              {method.responseType}
-            </Typography>
-            {method.resolvedResponseType && (
-              <MessageTable message={method.resolvedResponseType} />
-            )}
+              <Typography variant="h6" gutterBottom>
+                {method.responseType}
+              </Typography>
+              {method.resolvedResponseType && (
+                <MessageTable message={method.resolvedResponseType} />
+              )}
+            </div>
           </>
         ))}
       </div>
