@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import Markdown from 'markdown-to-jsx';
+import { fullName } from './proto';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,7 +64,7 @@ const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
         </TableCell>
         <TableCell className={classes.typeHeader}>
           {field.resolvedType ? (
-            <Link to={`/${field.resolvedType.fullName}`}>
+            <Link to={`/${fullName(field.resolvedType)}`}>
               {field.resolvedType.name}
             </Link>
           ) : (

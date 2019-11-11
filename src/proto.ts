@@ -95,6 +95,11 @@ export const jsonTemplate = (message: protobuf.Type): any => {
   return tmpl;
 };
 
+// Returns obj.fullName without the first period.
+export const fullName = (obj: protobuf.ReflectionObject): string => {
+  return obj.fullName[0] === '.' ? obj.fullName.substr(1) : obj.fullName;
+};
+
 // Add global reference to window for easier debugging.
 declare global {
   interface Window {

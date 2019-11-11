@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import { namespaces, services, methods, parentOf } from './proto';
+import { namespaces, services, parentOf, fullName } from './proto';
 import ProtoContext from './ProtoContext';
 import ContentsItem from './ContentsItem';
 import Folder from '@material-ui/icons/Folder';
@@ -40,7 +40,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
           {services(ns).map(srv => (
             <ContentsItem
               title={srv.name}
-              href={`/${srv.fullName}`}
+              href={`/${fullName(srv)}`}
               key={srv.fullName}
               depth={depth + 1}
               classes={{ text: classes.service }}
@@ -72,9 +72,13 @@ const Contents: React.FC = () => {
           throw Error('Protobuf root should only contain namespaces');
         }
 
+        if (ns.fullName == '.google.protobuf') {
+          return null;
+        }
+
         return (
           <List className={classes.root} dense={true} key={ns.fullName}>
-            <ListSubheader>{ns.fullName}</ListSubheader>
+            <ListSubheader>{fullName(ns)}</ListSubheader>
             <Divider />
             <Namespace ns={ns as protobuf.Namespace} />
           </List>
