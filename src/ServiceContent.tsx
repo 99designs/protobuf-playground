@@ -8,6 +8,7 @@ import { methods } from './proto';
 import TableOfContents from './TableOfContents';
 import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
+import Markdown from 'markdown-to-jsx';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,13 +45,17 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
           {service.name}
         </Typography>
 
+        {service.comment && <Markdown>{service.comment}</Markdown>}
+
         {methods(service).map(method => (
-          <>
+          <div key={method.fullName}>
             <Box m={8} />
 
             <Typography variant="h5" gutterBottom id={method.name}>
               {method.name}
             </Typography>
+
+            {method.comment && <Markdown>{method.comment}</Markdown>}
 
             <div className={classes.messages}>
               <Typography variant="h6" gutterBottom>
@@ -67,7 +72,7 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
                 <MessageTable message={method.resolvedResponseType} />
               )}
             </div>
-          </>
+          </div>
         ))}
       </div>
     </div>

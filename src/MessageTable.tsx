@@ -12,6 +12,7 @@ import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
+import Markdown from 'markdown-to-jsx';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -76,7 +77,7 @@ const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
           )}
         </TableCell>
         <TableCell className={classes.descriptionHeader}>
-          {field.comment}
+          {field.comment && <Markdown>{field.comment}</Markdown>}
         </TableCell>
       </TableRow>
       {field.resolvedType &&

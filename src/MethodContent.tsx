@@ -10,6 +10,7 @@ import Breadcrumbs from './Breadcrumbs';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Playground from './Playground';
+import Markdown from 'markdown-to-jsx';
 
 const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const [tab, setTab] = useState(0);
@@ -26,7 +27,7 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
         {method.name}
       </Typography>
 
-      {method.comment && <Typography paragraph>{method.comment}</Typography>}
+      {method.comment && <Markdown>{method.comment}</Markdown>}
 
       <Tabs value={tab} onChange={handleChange}>
         <Tab label="Description" />
