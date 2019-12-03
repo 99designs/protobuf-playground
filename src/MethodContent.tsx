@@ -6,11 +6,10 @@ import Divider from '@material-ui/core/Divider';
 import Forward from '@material-ui/icons/Forward';
 import Reply from '@material-ui/icons/Reply';
 import MessageTable from './MessageTable';
-import Breadcrumbs from './Breadcrumbs';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Playground from './Playground';
-import Markdown from 'markdown-to-jsx';
+import ContentHeader from './ContentHeader';
 
 const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const [tab, setTab] = useState(0);
@@ -19,15 +18,7 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   };
   return (
     <div>
-      <Breadcrumbs object={method} />
-
-      <Box m={4} />
-
-      <Typography variant="h5" gutterBottom>
-        {method.name}
-      </Typography>
-
-      {method.comment && <Markdown>{method.comment}</Markdown>}
+      <ContentHeader object={method} />
 
       <Tabs value={tab} onChange={handleChange}>
         <Tab label="Description" />

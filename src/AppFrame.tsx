@@ -4,6 +4,7 @@ import Drawer from '@material-ui/core/Drawer';
 import Contents from './Contents';
 import ProtoContext from './ProtoContext';
 import protobuf from 'protobufjs';
+import EnumContent from './EnumContent';
 import MethodContent from './MethodContent';
 import MessageContent from './MessageContent';
 import ServiceContent from './ServiceContent';
@@ -47,15 +48,16 @@ const AppFrame = () => {
         <Contents />
       </Drawer>
       <main className={classes.content}>
-        {selected && selected instanceof protobuf.Method && (
+        {selected instanceof protobuf.Method && (
           <MethodContent method={selected} />
         )}
-        {selected && selected instanceof protobuf.Type && (
+        {selected instanceof protobuf.Type && (
           <MessageContent message={selected} />
         )}
-        {selected && selected instanceof protobuf.Service && (
+        {selected instanceof protobuf.Service && (
           <ServiceContent service={selected} />
         )}
+        {selected instanceof protobuf.Enum && <EnumContent enm={selected} />}
       </main>
     </div>
   );

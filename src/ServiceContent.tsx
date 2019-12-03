@@ -1,13 +1,13 @@
 import React from 'react';
 import protobuf from 'protobufjs';
-import Breadcrumbs from './Breadcrumbs';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import { methods } from './proto';
 import TableOfContents from './TableOfContents';
 import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
 import Markdown from 'markdown-to-jsx';
+import ContentHeader from './ContentHeader';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,20 +34,10 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
       />
 
       <div className={classes.content}>
-        <Breadcrumbs object={service} />
-
-        <Box m={4} />
-
-        <Typography variant="h4">{service.name}</Typography>
-
-        {service.comment && (
-          <Markdown options={{ forceBlock: true }}>{service.comment}</Markdown>
-        )}
+        <ContentHeader object={service} />
 
         {methods(service).map(method => (
           <div key={method.fullName}>
-            <Box m={6} />
-
             <Typography variant="h5" gutterBottom id={method.name}>
               {method.name}
             </Typography>
@@ -73,6 +63,8 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
                 />
               )}
             </div>
+
+            <Box m={6} />
           </div>
         ))}
       </div>

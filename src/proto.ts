@@ -96,3 +96,20 @@ export const jsonTemplate = (message: protobuf.Type): any => {
 export const fullName = (obj: protobuf.ReflectionObject): string => {
   return obj.fullName[0] === '.' ? obj.fullName.substr(1) : obj.fullName;
 };
+
+export const typeName = (obj: protobuf.ReflectionObject): string => {
+  console.log(obj);
+  if (obj instanceof protobuf.Service) {
+    return 'Service';
+  }
+  if (obj instanceof protobuf.Method) {
+    return 'Method';
+  }
+  if (obj instanceof protobuf.Type) {
+    return 'Message';
+  }
+  if (obj instanceof protobuf.Enum) {
+    return 'Enum';
+  }
+  return '';
+};
