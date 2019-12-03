@@ -16,9 +16,7 @@ const useStyles = makeStyles(theme => ({
   content: {
     flexGrow: 1,
   },
-  messages: {
-    paddingLeft: theme.spacing(2),
-  },
+  messages: {},
 }));
 
 const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
@@ -40,35 +38,39 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
 
         <Box m={4} />
 
-        <Typography variant="h4" gutterBottom>
-          {service.name}
-        </Typography>
+        <Typography variant="h4">{service.name}</Typography>
 
-        {service.comment && <Markdown>{service.comment}</Markdown>}
+        {service.comment && (
+          <Markdown options={{ forceBlock: true }}>{service.comment}</Markdown>
+        )}
 
         {methods(service).map(method => (
           <div key={method.fullName}>
-            <Box m={8} />
+            <Box m={6} />
 
             <Typography variant="h5" gutterBottom id={method.name}>
               {method.name}
             </Typography>
 
-            {method.comment && <Markdown>{method.comment}</Markdown>}
+            {method.comment && (
+              <Markdown options={{ forceBlock: true }}>
+                {method.comment}
+              </Markdown>
+            )}
 
             <div className={classes.messages}>
-              <Typography variant="h6" gutterBottom>
-                {method.requestType}
-              </Typography>
               {method.resolvedRequestType && (
-                <MessageTable message={method.resolvedRequestType} />
+                <MessageTable
+                  message={method.resolvedRequestType}
+                  type="request"
+                />
               )}
-
-              <Typography variant="h6" gutterBottom>
-                {method.responseType}
-              </Typography>
+              <Box m={2} />
               {method.resolvedResponseType && (
-                <MessageTable message={method.resolvedResponseType} />
+                <MessageTable
+                  message={method.resolvedResponseType}
+                  type="response"
+                />
               )}
             </div>
           </div>

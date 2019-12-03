@@ -14,11 +14,12 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import Markdown from 'markdown-to-jsx';
 import { fullName } from './proto';
+import ArrowForward from '@material-ui/icons/ArrowForward';
+import ArrowBack from '@material-ui/icons/ArrowBack';
 
 const useStyles = makeStyles(theme => ({
   root: {
     overflowX: 'auto',
-    marginBottom: theme.spacing(4),
   },
   expandHeader: {
     width: 100,
@@ -45,6 +46,10 @@ const useStyles = makeStyles(theme => ({
     '& p + p': {
       marginTop: theme.spacing(2),
     },
+  },
+  title: {
+    fontSize: 16,
+    backgroundColor: theme.palette.grey[100],
   },
 }));
 
@@ -111,12 +116,21 @@ const MessageTableInner: React.FC<{
 
 const MessageTable: React.FC<{
   message: protobuf.Type;
-}> = ({ message }) => {
+  type?: 'request' | 'response';
+}> = ({ message, type }) => {
   const classes = useStyles();
   return (
     <Paper className={classes.root}>
       <Table>
         <TableHead>
+          <TableRow>
+            <TableCell colSpan={4} className={classes.title}>
+              {type === 'request' && <ArrowForward fontSize="inherit" />}
+              {type === 'response' && <ArrowBack fontSize="inherit" />}
+              {type && ' '}
+              {message.name}
+            </TableCell>
+          </TableRow>
           <TableRow>
             <TableCell></TableCell>
             <TableCell className={classes.fieldHeader}>Field</TableCell>
