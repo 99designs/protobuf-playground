@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import Contents from './Contents';
 import ProtoContext from './ProtoContext';
@@ -39,7 +38,6 @@ const AppFrame = () => {
   }, [selected]);
   return (
     <div className={classes.root}>
-      <CssBaseline />
       <Drawer
         variant="permanent"
         anchor="left"
