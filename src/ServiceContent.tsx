@@ -1,7 +1,6 @@
 import React from 'react';
 import protobuf from 'protobufjs';
 import Breadcrumbs from './Breadcrumbs';
-import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { methods } from './proto';

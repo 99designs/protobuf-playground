@@ -37,7 +37,7 @@ const App: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
         clearTimeout(timeout);
       });
     });
-  }, []);
+  }, [jsonUrl]);
   return (
     <BrowserRouter>
       <CssBaseline />

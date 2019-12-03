@@ -55,7 +55,7 @@ const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
 };
 
 const hasSingleChild = (ns: protobuf.Namespace): boolean => {
-  return namespaces(ns).length == 1 && services(ns).length == 0;
+  return namespaces(ns).length === 1 && services(ns).length === 0;
 };
 
 const Contents: React.FC = () => {
@@ -72,7 +72,7 @@ const Contents: React.FC = () => {
           throw Error('Protobuf root should only contain namespaces');
         }
 
-        if (ns.fullName == '.google.protobuf') {
+        if (ns.fullName === '.google.protobuf') {
           return null;
         }
 
