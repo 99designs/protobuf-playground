@@ -8,7 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 const useStyles = makeStyles(theme => ({
-  loadingRoot: {
+  messageRoot: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -18,30 +18,44 @@ const useStyles = makeStyles(theme => ({
 
 const App: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
   // TODO replace all this loading logic with suspense
-  const [longLoad, setLongLoad] = useState<boolean>(false);
+  const [loadState, setLoadState] = useState<
+    'loading' | 'longLoading' | 'error' | 'done'
+  >('loading');
   const [root, setRoot] = useState<protobuf.Root | null>(null);
   const classes = useStyles();
   useEffect(() => {
-    console.log('setting timeout');
     const timeout = window.setTimeout(() => {
-      console.log('hit timeout');
-      setLongLoad(true);
+      setLoadState('longLoading');
     }, 2000);
-    fetch(jsonUrl).then(res => {
-      res.json().then(data => {
-        const root = protobuf.Root.fromJSON(data);
-        // Assume that the imported root is complete and will validate.
-        // This resolved references to actual type objects rather than just strings.
-        root.resolveAll();
-        setRoot(root);
-        clearTimeout(timeout);
-      });
-    });
+    const error = () => {
+      clearTimeout(timeout);
+      setLoadState('error');
+    };
+    fetch(jsonUrl)
+      .then(res => {
+        if (res.status === 200) {
+          res
+            .json()
+            .then(data => {
+              const root = protobuf.Root.fromJSON(data);
+              // Assume that the imported root is complete and will validate.
+              // This resolved references to actual type objects rather than just strings.
+              root.resolveAll();
+              setRoot(root);
+              clearTimeout(timeout);
+              setLoadState('done');
+            })
+            .catch(error);
+        } else {
+          error();
+        }
+      })
+      .catch(error);
   }, [jsonUrl]);
   return (
     <BrowserRouter>
       <CssBaseline />
-      {root ? (
+      {loadState === 'done' && root && (
         <Route path="/:object">
           {({ match }) => {
             let selected = null;
@@ -55,14 +69,16 @@ const App: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
             );
           }}
         </Route>
-      ) : (
-        <div className={classes.loadingRoot}>
-          {longLoad && (
-            <>
-              <CircularProgress />
-              <p>Loading protobuf data…</p>
-            </>
-          )}
+      )}
+      {loadState === 'longLoading' && (
+        <div className={classes.messageRoot}>
+          <CircularProgress />
+          <p>Loading protobuf data…</p>
+        </div>
+      )}
+      {loadState === 'error' && (
+        <div className={classes.messageRoot}>
+          <p>Could not load protobuf data</p>
         </div>
       )}
     </BrowserRouter>
