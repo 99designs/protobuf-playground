@@ -113,3 +113,12 @@ export const typeName = (obj: protobuf.ReflectionObject): string => {
   }
   return '';
 };
+
+// Returns a sorted list of enum values as tuples ordered by id
+export const valuesByID = (
+  enm: protobuf.Enum
+): { id: number; value: string }[] => {
+  return Object.keys(enm.values)
+    .map(value => ({ id: enm.values[value], value }))
+    .sort((a, b) => a.id - b.id);
+};

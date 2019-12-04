@@ -6,7 +6,7 @@ import { methods } from './proto';
 import TableOfContents from './TableOfContents';
 import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
-import Markdown from 'markdown-to-jsx';
+import MarkdownBlock from './MarkdownBlock';
 import ContentHeader from './ContentHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -42,11 +42,7 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
               {method.name}
             </Typography>
 
-            {method.comment && (
-              <Markdown options={{ forceBlock: true }}>
-                {method.comment}
-              </Markdown>
-            )}
+            <MarkdownBlock>{method.comment}</MarkdownBlock>
 
             <div className={classes.messages}>
               {method.resolvedRequestType && (

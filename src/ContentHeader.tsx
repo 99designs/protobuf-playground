@@ -3,9 +3,9 @@ import protobuf from 'protobufjs';
 import Breadcrumbs from './Breadcrumbs';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-import Markdown from 'markdown-to-jsx';
 import { typeName } from './proto';
 import { makeStyles } from '@material-ui/core/styles';
+import MarkdownBlock from './MarkdownBlock';
 
 const useStyles = makeStyles(theme => ({
   type: {
@@ -27,9 +27,7 @@ const ContentHeader: React.FC<{
         {object.name}
         <span className={classes.type}>{typeName(object)}</span>
       </Typography>
-      {object.comment && (
-        <Markdown options={{ forceBlock: true }}>{object.comment}</Markdown>
-      )}
+      <MarkdownBlock>{object.comment}</MarkdownBlock>
       <Box m={6} />
     </>
   );
