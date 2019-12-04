@@ -28,6 +28,27 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const contentFor = (
+  selected: protobuf.ReflectionObject | null
+): React.ReactNode => {
+  if (selected instanceof protobuf.Method) {
+    return <MethodContent method={selected} />;
+  }
+  if (selected instanceof protobuf.Type) {
+    return <MessageContent message={selected} />;
+  }
+  if (selected instanceof protobuf.Service) {
+    return <ServiceContent service={selected} />;
+  }
+  if (selected instanceof protobuf.Enum) {
+    return <EnumContent enm={selected} />;
+  }
+  if (selected instanceof protobuf.Namespace) {
+    return <NamespaceContent namespace={selected} />;
+  }
+  return null;
+};
+
 const AppFrame = () => {
   const classes = useStyles();
   const { selected } = useContext(ProtoContext);
@@ -48,21 +69,7 @@ const AppFrame = () => {
       >
         <Contents />
       </Drawer>
-      <main className={classes.content}>
-        {selected instanceof protobuf.Method && (
-          <MethodContent method={selected} />
-        )}
-        {selected instanceof protobuf.Type && (
-          <MessageContent message={selected} />
-        )}
-        {selected instanceof protobuf.Service && (
-          <ServiceContent service={selected} />
-        )}
-        {selected instanceof protobuf.Enum && <EnumContent enm={selected} />}
-        {selected instanceof protobuf.Namespace && (
-          <NamespaceContent namespace={selected} />
-        )}
-      </main>
+      <main className={classes.content}>{contentFor(selected)}</main>
     </div>
   );
 };
