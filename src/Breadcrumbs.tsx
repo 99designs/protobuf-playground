@@ -8,14 +8,14 @@ import Typography from '@material-ui/core/Typography';
 const Breadcrumbs: React.FC<{ object: protobuf.ReflectionObject }> = ({
   object,
 }) => (
-  <MuiBreadcrumbs>
+  <MuiBreadcrumbs color="inherit">
     {object.parent &&
       heirarchy(object.parent).map(obj => (
         <Link to={`/${fullName(obj)}`} key={obj.fullName} color="inherit">
           {obj.name}
         </Link>
       ))}
-    <Typography color="textPrimary">{object.name}</Typography>
+    <Typography color="inherit">{object.name}</Typography>
   </MuiBreadcrumbs>
 );
 

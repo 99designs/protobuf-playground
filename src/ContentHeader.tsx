@@ -1,6 +1,5 @@
 import React from 'react';
 import protobuf from 'protobufjs';
-import Breadcrumbs from './Breadcrumbs';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { typeName } from './proto';
@@ -21,8 +20,6 @@ const ContentHeader: React.FC<{
   const classes = useStyles();
   return (
     <>
-      <Breadcrumbs object={object} />
-      <Box m={4} />
       <Typography variant="h4">
         {object.name}
         <span className={classes.type}>{typeName(object)}</span>

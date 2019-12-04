@@ -9,6 +9,7 @@ import MethodContent from './MethodContent';
 import MessageContent from './MessageContent';
 import NamespaceContent from './NamespaceContent';
 import ServiceContent from './ServiceContent';
+import AppBar from './AppBar';
 
 const drawerWidth = 300;
 
@@ -25,6 +26,7 @@ const useStyles = makeStyles(theme => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    marginTop: theme.spacing(8),
   },
 }));
 
@@ -69,6 +71,7 @@ const AppFrame = () => {
       >
         <Contents />
       </Drawer>
+      <AppBar />
       <main className={classes.content}>{contentFor(selected)}</main>
     </div>
   );
