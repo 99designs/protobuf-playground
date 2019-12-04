@@ -7,6 +7,7 @@ import protobuf from 'protobufjs';
 import EnumContent from './EnumContent';
 import MethodContent from './MethodContent';
 import MessageContent from './MessageContent';
+import NamespaceContent from './NamespaceContent';
 import ServiceContent from './ServiceContent';
 
 const drawerWidth = 300;
@@ -58,6 +59,9 @@ const AppFrame = () => {
           <ServiceContent service={selected} />
         )}
         {selected instanceof protobuf.Enum && <EnumContent enm={selected} />}
+        {selected instanceof protobuf.Namespace && (
+          <NamespaceContent namespace={selected} />
+        )}
       </main>
     </div>
   );

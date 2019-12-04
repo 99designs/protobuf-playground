@@ -111,6 +111,9 @@ export const typeName = (obj: protobuf.ReflectionObject): string => {
   if (obj instanceof protobuf.Enum) {
     return 'Enum';
   }
+  if (obj instanceof protobuf.Namespace) {
+    return 'Namespace';
+  }
   return '';
 };
 
