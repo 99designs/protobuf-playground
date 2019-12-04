@@ -1,5 +1,8 @@
 import protobuf from 'protobufjs';
 
+// Utility functions for working with protobufjs objects.  Mostly covering gaps in their
+// API for our common use-cases.
+
 const byName = (a: { name: string }, b: { name: string }) =>
   a.name.localeCompare(b.name);
 
@@ -125,3 +128,20 @@ export const valuesByID = (
     .map(value => ({ id: enm.values[value], value }))
     .sort((a, b) => a.id - b.id);
 };
+
+// Reducer to flatten out array of proto objects.
+const _flatten = (
+  arr: protobuf.ReflectionObject[],
+  obj: protobuf.ReflectionObject
+): protobuf.ReflectionObject[] => {
+  if (!(obj instanceof protobuf.Root)) {
+    arr.push(obj);
+  }
+  if (obj instanceof protobuf.Namespace) {
+    obj.nestedArray.reduce(_flatten, arr);
+  }
+  return arr;
+};
+
+export const flatten = (obj: protobuf.Namespace): protobuf.ReflectionObject[] =>
+  _flatten([], obj);
