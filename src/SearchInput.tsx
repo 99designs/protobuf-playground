@@ -45,7 +45,7 @@ const SearchInput = React.forwardRef<HTMLDivElement, InputBaseProps>(
   (props, ref) => {
     const classes = useStyles();
     return (
-      <div className={classes.root} ref={ref}>
+      <div className={classes.root}>
         <div className={classes.icon}>
           <SearchIcon />
         </div>
@@ -55,6 +55,7 @@ const SearchInput = React.forwardRef<HTMLDivElement, InputBaseProps>(
             root: classes.inputRoot,
             input: classes.inputInput,
           }}
+          inputRef={ref}
           {...props}
         />
       </div>

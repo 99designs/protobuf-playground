@@ -4,10 +4,11 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import ProtoContext from './ProtoContext';
 import Fuse from 'fuse.js';
-import { flatten, typeName } from './proto';
+import { flatten, typeName, fullName } from './proto';
 import protobuf from 'protobufjs';
 import SearchInput from './SearchInput';
 import clsx from 'clsx';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   resultsPaper: {
@@ -22,6 +23,9 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
     cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: theme.palette.action.selected,
+    },
   },
   resultSelected: {
     backgroundColor: theme.palette.action.selected,
@@ -52,6 +56,11 @@ const Search: React.FC = () => {
   const [results, setResults] = useState<protobuf.ReflectionObject[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const inputEl = useRef<HTMLDivElement>(null);
+  const history = useHistory();
+  const goto = (result: protobuf.ReflectionObject) => {
+    history.push(`/${fullName(result)}`);
+    inputEl.current && inputEl.current.blur();
+  };
   return (
     <>
       <SearchInput
@@ -61,6 +70,10 @@ const Search: React.FC = () => {
         onFocus={event =>
           setResults(fuse.search(event.target.value).slice(0, 10))
         }
+        onBlur={() => {
+          setResults([]);
+          setSelected(null);
+        }}
         onKeyDown={event => {
           switch (event.key) {
             case 'ArrowDown':
@@ -79,6 +92,11 @@ const Search: React.FC = () => {
                 setSelected(selected === 0 ? results.length - 1 : selected - 1);
               }
               break;
+            case 'Enter':
+              if (selected !== null) {
+                event.preventDefault();
+                goto(results[selected]);
+              }
           }
         }}
         ref={inputEl}
@@ -97,12 +115,13 @@ const Search: React.FC = () => {
                   [classes.resultSelected]: selected === i,
                 })}
                 key={result.fullName}
+                onMouseDown={() => goto(result)}
               >
                 <div className={classes.resultName}>
                   {result.name}
                   <span className={classes.resultType}>{typeName(result)}</span>
                 </div>
-                <div className={classes.resultFullName}>{result.fullName}</div>
+                <div className={classes.resultFullName}>{fullName(result)}</div>
               </li>
             ))}
           </ul>
