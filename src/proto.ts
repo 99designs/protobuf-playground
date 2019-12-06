@@ -101,7 +101,6 @@ export const fullName = (obj: protobuf.ReflectionObject): string => {
 };
 
 export const typeName = (obj: protobuf.ReflectionObject): string => {
-  console.log(obj);
   if (obj instanceof protobuf.Service) {
     return 'Service';
   }

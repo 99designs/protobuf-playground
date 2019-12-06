@@ -1,83 +1,114 @@
-import React, { useContext, useMemo } from 'react';
-import SearchIcon from '@material-ui/icons/Search';
-import InputBase from '@material-ui/core/InputBase';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import React, { useContext, useMemo, useState, useRef } from 'react';
+import Popper from '@material-ui/core/Popper';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
 import ProtoContext from './ProtoContext';
 import Fuse from 'fuse.js';
-import { flatten } from './proto';
+import { flatten, typeName } from './proto';
+import protobuf from 'protobufjs';
+import SearchInput from './SearchInput';
+import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(3),
-      width: 'auto',
-    },
+  resultsPaper: {
+    width: 400,
   },
-  icon: {
-    width: theme.spacing(7),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+  resultsList: {
+    marginTop: theme.spacing(1),
+    padding: `${theme.spacing(1)}px 0`,
+    listStyle: 'none',
   },
-  inputRoot: {
-    color: 'inherit',
+  resultRoot: {
+    margin: 0,
+    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+    cursor: 'pointer',
   },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 7),
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: 200,
-    },
+  resultSelected: {
+    backgroundColor: theme.palette.action.selected,
+  },
+  resultName: {
+    fontSize: 16,
+  },
+  resultType: {
+    fontSize: '0.8em',
+    paddingLeft: theme.spacing(1),
+    color: theme.palette.grey[800],
+  },
+  resultFullName: {
+    fontSize: 12,
+    color: theme.palette.grey[600],
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 }));
 
-const SearchInput: React.FC<{
-  onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
-}> = ({ onChange }) => {
-  const classes = useStyles();
-  return (
-    <div className={classes.root}>
-      <div className={classes.icon}>
-        <SearchIcon />
-      </div>
-      <InputBase
-        placeholder="Search…"
-        classes={{
-          root: classes.inputRoot,
-          input: classes.inputInput,
-        }}
-        onChange={onChange}
-      />
-    </div>
-  );
-};
-
 const Search: React.FC = () => {
+  const classes = useStyles();
   const { root } = useContext(ProtoContext);
   const fuse = useMemo(() => {
     const input = flatten(root);
-    return new Fuse(input, { keys: ['name', 'fullName'] });
+    return new Fuse(input, { keys: ['name'], threshold: 0.4 });
   }, [root]);
+  const [results, setResults] = useState<protobuf.ReflectionObject[]>([]);
+  const [selected, setSelected] = useState<number | null>(null);
+  const inputEl = useRef<HTMLDivElement>(null);
   return (
-    <SearchInput
-      onChange={event => {
-        const results = fuse.search(event.target.value);
-        console.log(results);
-      }}
-    />
+    <>
+      <SearchInput
+        onChange={event =>
+          setResults(fuse.search(event.target.value).slice(0, 10))
+        }
+        onFocus={event =>
+          setResults(fuse.search(event.target.value).slice(0, 10))
+        }
+        onKeyDown={event => {
+          switch (event.key) {
+            case 'ArrowDown':
+              event.preventDefault();
+              if (selected === null) {
+                setSelected(0);
+              } else {
+                setSelected((selected + 1) % results.length);
+              }
+              break;
+            case 'ArrowUp':
+              event.preventDefault();
+              if (selected === null) {
+                setSelected(0);
+              } else {
+                setSelected(selected === 0 ? results.length - 1 : selected - 1);
+              }
+              break;
+          }
+        }}
+        ref={inputEl}
+      />
+      <Popper
+        open={results.length > 0}
+        anchorEl={inputEl.current}
+        placement="bottom-end"
+        disablePortal
+      >
+        <Paper className={classes.resultsPaper}>
+          <ul className={classes.resultsList}>
+            {results.map((result, i) => (
+              <li
+                className={clsx(classes.resultRoot, {
+                  [classes.resultSelected]: selected === i,
+                })}
+                key={result.fullName}
+              >
+                <div className={classes.resultName}>
+                  {result.name}
+                  <span className={classes.resultType}>{typeName(result)}</span>
+                </div>
+                <div className={classes.resultFullName}>{result.fullName}</div>
+              </li>
+            ))}
+          </ul>
+        </Paper>
+      </Popper>
+    </>
   );
 };
 
