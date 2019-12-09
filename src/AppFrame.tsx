@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Contents from './Contents';
@@ -34,6 +34,7 @@ const useStyles = makeStyles(theme => ({
 const contentFor = (
   selected: protobuf.ReflectionObject | null
 ): React.ReactNode => {
+  console.log('content for', selected);
   if (selected instanceof protobuf.Method) {
     return <MethodContent method={selected} />;
   }
@@ -54,7 +55,7 @@ const contentFor = (
 
 const AppFrame = () => {
   const classes = useStyles();
-  const { selected } = useContext(ProtoContext);
+  const { root, selected } = useContext(ProtoContext);
   useEffect(() => {
     let title = 'Protobuf Playground';
     if (selected) {
@@ -62,6 +63,11 @@ const AppFrame = () => {
     }
     document.title = title;
   }, [selected]);
+  const drawerContents = useMemo(
+    () => <Contents root={root} selected={selected} />,
+    [root, selected]
+  );
+  const content = useMemo(() => contentFor(selected), [selected]);
   return (
     <div className={classes.root}>
       <Drawer
@@ -70,11 +76,11 @@ const AppFrame = () => {
         className={classes.drawer}
         classes={{ paper: classes.drawerPaper }}
       >
-        <Contents />
+        {drawerContents}
       </Drawer>
       <AppBar />
       <TableOfContents />
-      <main className={classes.content}>{contentFor(selected)}</main>
+      <main className={classes.content}>{content}</main>
     </div>
   );
 };

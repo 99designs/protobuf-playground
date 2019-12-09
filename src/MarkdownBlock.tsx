@@ -14,7 +14,7 @@ const MarkdownBlock: React.FC<{ children?: string | null }> = ({
   const classes = useStyles();
   return children ? (
     <div className={classes.root}>
-      <Markdown>{children}</Markdown>
+      <Markdown options={{ forceBlock: true }}>{children}</Markdown>
     </div>
   ) : null;
 };

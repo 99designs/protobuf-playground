@@ -1,11 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { namespaces, services, parentOf, fullName } from './proto';
-import ProtoContext from './ProtoContext';
 import ContentsItem from './ContentsItem';
 import Folder from '@material-ui/icons/Folder';
 import Settings from '@material-ui/icons/Settings';
@@ -20,11 +19,11 @@ const useStyles = makeStyles(theme => ({
   service: {},
 }));
 
-const Namespace: React.FC<{ ns: protobuf.Namespace; depth?: number }> = ({
-  ns,
-  depth = 0,
-}) => {
-  const { selected } = useContext(ProtoContext);
+const Namespace: React.FC<{
+  ns: protobuf.Namespace;
+  depth?: number;
+  selected: protobuf.ReflectionObject | null;
+}> = ({ ns, depth = 0, selected }) => {
   const classes = useStyles();
   return (
     <>
@@ -58,9 +57,11 @@ const hasSingleChild = (ns: protobuf.Namespace): boolean => {
   return namespaces(ns).length === 1 && services(ns).length === 0;
 };
 
-const Contents: React.FC = () => {
+const Contents: React.FC<{
+  root: protobuf.Root;
+  selected: protobuf.ReflectionObject | null;
+}> = ({ root, selected }) => {
   const classes = useStyles();
-  const { root } = useContext(ProtoContext);
   return (
     <>
       {root.nestedArray.map(ns => {
@@ -80,7 +81,7 @@ const Contents: React.FC = () => {
           <List className={classes.root} dense={true} key={ns.fullName}>
             <ListSubheader>{fullName(ns)}</ListSubheader>
             <Divider />
-            <Namespace ns={ns as protobuf.Namespace} />
+            <Namespace ns={ns as protobuf.Namespace} selected={selected} />
           </List>
         );
       })}
