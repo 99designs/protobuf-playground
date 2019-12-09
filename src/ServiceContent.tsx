@@ -1,69 +1,58 @@
 import React from 'react';
-import protobuf from 'protobufjs';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { methods } from './proto';
-import TableOfContents from './TableOfContents';
 import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
 import MarkdownBlock from './MarkdownBlock';
 import ContentHeader from './ContentHeader';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
+  root: {},
+  methodName: {
+    position: 'relative',
   },
-  content: {
-    flexGrow: 1,
+  anchorLink: {
+    marginTop: -96, // Offset for the anchor.
+    position: 'absolute',
   },
-  messages: {},
 }));
 
 const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
   service,
 }) => {
   const classes = useStyles();
-
   return (
     <div className={classes.root}>
-      <TableOfContents
-        items={methods(service).map(method => ({
-          title: method.name,
-          hash: method.name,
-        }))}
-      />
+      <ContentHeader object={service} />
 
-      <div className={classes.content}>
-        <ContentHeader object={service} />
+      {methods(service).map(method => (
+        <div key={method.fullName}>
+          <Typography variant="h5" gutterBottom className={classes.methodName}>
+            <a
+              href={`#${method.name}`}
+              id={method.name}
+              className={classes.anchorLink}
+            />
+            {method.name}
+          </Typography>
 
-        {methods(service).map(method => (
-          <div key={method.fullName}>
-            <Typography variant="h5" gutterBottom id={method.name}>
-              {method.name}
-            </Typography>
+          <MarkdownBlock>{method.comment}</MarkdownBlock>
 
-            <MarkdownBlock>{method.comment}</MarkdownBlock>
+          {method.resolvedRequestType && (
+            <MessageTable message={method.resolvedRequestType} type="request" />
+          )}
+          <Box m={2} />
+          {method.resolvedResponseType && (
+            <MessageTable
+              message={method.resolvedResponseType}
+              type="response"
+            />
+          )}
 
-            <div className={classes.messages}>
-              {method.resolvedRequestType && (
-                <MessageTable
-                  message={method.resolvedRequestType}
-                  type="request"
-                />
-              )}
-              <Box m={2} />
-              {method.resolvedResponseType && (
-                <MessageTable
-                  message={method.resolvedResponseType}
-                  type="response"
-                />
-              )}
-            </div>
-
-            <Box m={6} />
-          </div>
-        ))}
-      </div>
+          <Box m={6} />
+        </div>
+      ))}
     </div>
   );
 };

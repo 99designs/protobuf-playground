@@ -10,6 +10,7 @@ import MessageContent from './MessageContent';
 import NamespaceContent from './NamespaceContent';
 import ServiceContent from './ServiceContent';
 import AppBar from './AppBar';
+import TableOfContents from './TableOfContents';
 
 const drawerWidth = 300;
 
@@ -72,6 +73,7 @@ const AppFrame = () => {
         <Contents />
       </Drawer>
       <AppBar />
+      <TableOfContents />
       <main className={classes.content}>{contentFor(selected)}</main>
     </div>
   );
