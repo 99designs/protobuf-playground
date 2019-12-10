@@ -15,7 +15,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const App: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
+const App: React.FC<{ jsonUrl: string; title: string }> = ({
+  jsonUrl,
+  title,
+}) => {
   // TODO replace all this loading logic with suspense
   const [loadState, setLoadState] = useState<
     'loading' | 'longLoading' | 'error' | 'done'
@@ -61,7 +64,7 @@ const App: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
             if (match) {
               selected = root.lookup(match.params.object);
             }
-            return <AppFrame root={root} selected={selected} />;
+            return <AppFrame title={title} root={root} selected={selected} />;
           }}
         </Route>
       )}

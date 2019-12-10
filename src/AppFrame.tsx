@@ -64,14 +64,15 @@ const contentFor = (
 const AppFrame: React.FC<{
   root: protobuf.Root;
   selected: protobuf.ReflectionObject | null;
-}> = ({ root, selected }) => {
+  title: string;
+}> = ({ root, selected, title }) => {
   const classes = useStyles();
   useEffect(() => {
-    let title = 'Protobuf Playground';
+    let newTitle = title;
     if (selected) {
-      title = `${selected.name} — ${title}`;
+      newTitle = `${selected.name} — ${newTitle}`;
     }
-    document.title = title;
+    document.title = newTitle;
   }, [selected]);
   const drawerContents = useMemo(
     () => <Contents root={root} selected={selected} />,
