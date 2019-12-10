@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
-import ProtoContext from './ProtoContext';
 import protobuf from 'protobufjs';
 import { methods } from './proto';
 
@@ -37,9 +36,10 @@ export interface TocItem {
   hash: string;
 }
 
-const TableOfContents: React.FC = () => {
+const TableOfContents: React.FC<{
+  selected: protobuf.ReflectionObject | null;
+}> = ({ selected }) => {
   const classes = useStyles();
-  const { selected } = useContext(ProtoContext);
 
   if (!(selected instanceof protobuf.Service)) {
     return null;

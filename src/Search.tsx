@@ -1,8 +1,7 @@
-import React, { useContext, useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import Popper from '@material-ui/core/Popper';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
-import ProtoContext from './ProtoContext';
 import Fuse from 'fuse.js';
 import { flatten, typeName, fullName } from './proto';
 import protobuf from 'protobufjs';
@@ -46,9 +45,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Search: React.FC = () => {
+const Search: React.FC<{ root: protobuf.Root }> = ({ root }) => {
   const classes = useStyles();
-  const { root } = useContext(ProtoContext);
   const fuse = useMemo(() => {
     const input = flatten(root);
     return new Fuse(input, { keys: ['name'], threshold: 0.4 });

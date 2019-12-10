@@ -1,16 +1,18 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import Contents from './Contents';
-import ProtoContext from './ProtoContext';
 import protobuf from 'protobufjs';
 import EnumContent from './EnumContent';
 import MethodContent from './MethodContent';
 import MessageContent from './MessageContent';
 import NamespaceContent from './NamespaceContent';
 import ServiceContent from './ServiceContent';
-import AppBar from './AppBar';
 import TableOfContents from './TableOfContents';
+import Breadcrumbs from './Breadcrumbs';
+import Search from './Search';
 
 const drawerWidth = 300;
 
@@ -28,6 +30,12 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     padding: theme.spacing(3),
     marginTop: theme.spacing(8),
+  },
+  appBar: {
+    width: `calc(100% - ${drawerWidth}px)`,
+  },
+  grow: {
+    flexGrow: 1,
   },
 }));
 
@@ -53,9 +61,11 @@ const contentFor = (
   return null;
 };
 
-const AppFrame = () => {
+const AppFrame: React.FC<{
+  root: protobuf.Root;
+  selected: protobuf.ReflectionObject | null;
+}> = ({ root, selected }) => {
   const classes = useStyles();
-  const { root, selected } = useContext(ProtoContext);
   useEffect(() => {
     let title = 'Protobuf Playground';
     if (selected) {
@@ -78,8 +88,14 @@ const AppFrame = () => {
       >
         {drawerContents}
       </Drawer>
-      <AppBar />
-      <TableOfContents />
+      <AppBar className={classes.appBar}>
+        <Toolbar>
+          {selected && <Breadcrumbs object={selected} />}
+          <div className={classes.grow} />
+          <Search root={root} />
+        </Toolbar>
+      </AppBar>
+      <TableOfContents selected={selected} />
       <main className={classes.content}>{content}</main>
     </div>
   );

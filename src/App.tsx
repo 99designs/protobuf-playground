@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Route, BrowserRouter } from 'react-router-dom';
 import AppFrame from './AppFrame';
-import ProtoContext from './ProtoContext';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
@@ -62,11 +61,7 @@ const App: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
             if (match) {
               selected = root.lookup(match.params.object);
             }
-            return (
-              <ProtoContext.Provider value={{ root, selected }}>
-                <AppFrame />
-              </ProtoContext.Provider>
-            );
+            return <AppFrame root={root} selected={selected} />;
           }}
         </Route>
       )}
