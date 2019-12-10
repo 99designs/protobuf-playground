@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
   },
   anchorLink: {
-    marginTop: -96, // Offset for the anchor.
+    marginTop: theme.spacing(-12), // Offset for the anchor.
     position: 'absolute',
   },
 }));

@@ -8,6 +8,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+// TODO Markdown parsing is pretty slow, consider something like the `marked` package
 const MarkdownBlock: React.FC<{ children?: string | null }> = ({
   children,
 }) => {

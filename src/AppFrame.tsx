@@ -95,7 +95,7 @@ const AppFrame: React.FC<{
           <Search root={root} />
         </Toolbar>
       </AppBar>
-      <TableOfContents selected={selected} />
+      <TableOfContents object={selected} />
       <main className={classes.content}>{content}</main>
     </div>
   );
