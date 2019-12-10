@@ -108,7 +108,7 @@ const TableOfContents: React.FC<{
       clickedRef.current = false;
     }, 1000);
 
-    if (activeMethod != hash) {
+    if (activeMethod !== hash) {
       setActiveMethod(hash);
     }
   };

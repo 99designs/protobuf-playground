@@ -2,7 +2,6 @@ import React from 'react';
 import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { namespaces, services, parentOf, fullName } from './proto';
 import ContentsItem from './ContentsItem';
@@ -80,7 +79,6 @@ const Contents: React.FC<{
         return (
           <List className={classes.root} dense={true} key={ns.fullName}>
             <ListSubheader>{fullName(ns)}</ListSubheader>
-            <Divider />
             <Namespace ns={ns as protobuf.Namespace} selected={selected} />
           </List>
         );

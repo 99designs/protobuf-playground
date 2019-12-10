@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
+import Divider from '@material-ui/core/Divider';
 import Toolbar from '@material-ui/core/Toolbar';
 import Contents from './Contents';
 import protobuf from 'protobufjs';
@@ -36,6 +37,15 @@ const useStyles = makeStyles(theme => ({
   },
   grow: {
     flexGrow: 1,
+  },
+  drawerHeader: {
+    ...theme.mixins.toolbar,
+    paddingLeft: theme.spacing(2),
+    display: 'flex',
+    fontSize: 18,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
 }));
 
@@ -73,7 +83,7 @@ const AppFrame: React.FC<{
       newTitle = `${selected.name} — ${newTitle}`;
     }
     document.title = newTitle;
-  }, [selected]);
+  }, [selected, title]);
   const drawerContents = useMemo(
     () => <Contents root={root} selected={selected} />,
     [root, selected]
@@ -87,6 +97,10 @@ const AppFrame: React.FC<{
         className={classes.drawer}
         classes={{ paper: classes.drawerPaper }}
       >
+        <div className={classes.drawerHeader}>
+          <span>{title}</span>
+        </div>
+        <Divider />
         {drawerContents}
       </Drawer>
       <AppBar className={classes.appBar}>
