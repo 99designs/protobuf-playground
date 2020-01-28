@@ -1,8 +1,14 @@
 const protobufjs = require('protobufjs');
 const fs = require('fs');
 const path = require('path');
+const yargs = require('yargs').option('ignore', {
+  alias: 'i',
+  type: 'string',
+}).argv;
 
-let [rootPath, outFile = 'public/proto.json'] = process.argv.slice(2);
+const ignore = typeof yargs.ignore === 'string' ? [yargs.ignore] : yargs.ignore;
+
+let [rootPath, outFile = 'public/proto.json'] = yargs._;
 if (rootPath === undefined) {
   console.info('usage: generate.js proto-path');
   process.exit(1);
@@ -33,21 +39,17 @@ const parseOptions = {
 
 const root = new protobufjs.Root();
 root.resolvePath = (origin, include) => {
-  // FIXME this is not a great way to handle runtime proto definitions.  It works, but probably should rely on
-  // definitions shipped with protobuf.js
-  if (include.startsWith('google/protobuf/')) {
-    console.log('📦', include);
-    return (
-      'https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/' +
-      include
-    );
+  for (let i = 0; i < ignore.length; i++) {
+    if (include.endsWith(ignore[i])) {
+      return null;
+    }
   }
 
   if (!fs.existsSync(include)) {
     include = rootPath + '/' + include;
   }
 
-  console.log('📂', path.relative(rootPath, include));
+  console.log(path.relative(rootPath, include));
   return include;
 };
 
@@ -65,4 +67,4 @@ try {
 // e.g. { root: JSON.stringify(root), filenames: {} }
 const json = root.toJSON({ keepComments: true });
 fs.writeFileSync(outFile, JSON.stringify(json));
-console.log('💾', outFile);
+console.log('saved', outFile);
