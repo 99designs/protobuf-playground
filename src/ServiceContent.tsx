@@ -6,11 +6,15 @@ import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
 import MarkdownBlock from './MarkdownBlock';
 import ContentHeader from './ContentHeader';
+import CurlButton from './CurlButton';
 
 const useStyles = makeStyles(theme => ({
   root: {},
   methodName: {
     position: 'relative',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
   },
   anchorLink: {
     marginTop: theme.spacing(-12), // Offset for the anchor.
@@ -30,14 +34,21 @@ export default function ServiceContent({
 
       {methods(service).map(method => (
         <div key={method.fullName}>
-          <Typography variant="h5" gutterBottom className={classes.methodName}>
-            <a
-              href={`#${method.name}`}
-              id={method.name}
-              className={classes.anchorLink}
-            />
-            {method.name}
-          </Typography>
+          <div className={classes.methodName}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              className={classes.methodName}
+            >
+              <a
+                href={`#${method.name}`}
+                id={method.name}
+                className={classes.anchorLink}
+              />
+              {method.name}
+            </Typography>
+            <CurlButton method={method} />
+          </div>
 
           <MarkdownBlock>{method.comment}</MarkdownBlock>
 
