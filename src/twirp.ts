@@ -44,12 +44,17 @@ export const twirpCurl = (
   method: protobuf.Method,
   baseUrl: string = '',
   username: string = '',
-  password: string = ''
+  password: string = '',
+  formatJSON: boolean = false
 ) => {
   const url = urlFor(method, baseUrl);
   let data = '{}';
   if (method.resolvedRequestType) {
-    data = JSON.stringify(jsonTemplate(method.resolvedRequestType));
+    data = JSON.stringify(
+      jsonTemplate(method.resolvedRequestType),
+      null,
+      formatJSON ? 4 : 0
+    );
   }
   return `curl -X POST ${url} --user ${username}:${password} -H 'Content-Type:application/json' -d '${data}'`;
 };
