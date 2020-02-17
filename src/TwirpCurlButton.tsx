@@ -2,25 +2,23 @@ import React from 'react';
 import { IconButton, Tooltip, Snackbar } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import CloseIcon from '@material-ui/icons/Close';
+import { twirpCurl } from './twirp';
 
-const CurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
+const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleClick = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(method));
-    console.log(method);
+    await navigator.clipboard.writeText(twirpCurl(method));
 
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleClose = () => setOpen(false);
 
   return (
     <>
       <IconButton onClick={handleClick}>
-        <Tooltip title="Copy as cURL" placement="top">
+        <Tooltip title="Copy Twirp request as cURL" placement="top">
           <FileCopyIcon fontSize="small" />
         </Tooltip>
       </IconButton>
@@ -44,4 +42,4 @@ const CurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   );
 };
 
-export default CurlButton;
+export default TwirpCurlButton;

@@ -6,7 +6,7 @@ import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
 import MarkdownBlock from './MarkdownBlock';
 import ContentHeader from './ContentHeader';
-import CurlButton from './CurlButton';
+import TwirpCurlButton from './TwirpCurlButton';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -47,7 +47,7 @@ export default function ServiceContent({
               />
               {method.name}
             </Typography>
-            <CurlButton method={method} />
+            <TwirpCurlButton method={method} />
           </div>
 
           <MarkdownBlock>{method.comment}</MarkdownBlock>

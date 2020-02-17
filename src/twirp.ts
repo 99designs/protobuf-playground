@@ -40,6 +40,20 @@ const twirp = (baseUrl: string): protobuf.RPCImpl => {
   };
 };
 
+export const twirpCurl = (
+  method: protobuf.Method,
+  baseUrl: string = '',
+  username: string = '',
+  password: string = ''
+) => {
+  const url = urlFor(method, baseUrl);
+  let data = '{}';
+  if (method.resolvedRequestType) {
+    data = JSON.stringify(jsonTemplate(method.resolvedRequestType));
+  }
+  return `curl -X POST ${url} --user ${username}:${password} -H 'Content-Type:application/json' -d '${data}'`;
+};
+
 // headers.set('Authorization', 'Basic ' + base64.encode(username + ":" + password));
 
 export default twirp;
