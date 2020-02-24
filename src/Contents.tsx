@@ -18,11 +18,15 @@ const useStyles = makeStyles(theme => ({
   service: {},
 }));
 
-const Namespace: React.FC<{
+function Namespace({
+  ns,
+  depth = 0,
+  selected,
+}: {
   ns: protobuf.Namespace;
   depth?: number;
   selected: protobuf.ReflectionObject | null;
-}> = ({ ns, depth = 0, selected }) => {
+}) {
   const classes = useStyles();
   return (
     <>
@@ -50,16 +54,19 @@ const Namespace: React.FC<{
       ))}
     </>
   );
-};
+}
 
 const hasSingleChild = (ns: protobuf.Namespace): boolean => {
   return namespaces(ns).length === 1 && services(ns).length === 0;
 };
 
-const Contents: React.FC<{
+export default function Contents({
+  root,
+  selected,
+}: {
   root: protobuf.Root;
   selected: protobuf.ReflectionObject | null;
-}> = ({ root, selected }) => {
+}) {
   const classes = useStyles();
   return (
     <>
@@ -85,6 +92,4 @@ const Contents: React.FC<{
       })}
     </>
   );
-};
-
-export default Contents;
+}

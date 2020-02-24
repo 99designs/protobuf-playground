@@ -3,13 +3,15 @@ import protobuf from 'protobufjs';
 import MessageTable from './MessageTable';
 import ContentHeader from './ContentHeader';
 
-const MessageContent: React.FC<{ message: protobuf.Type }> = ({ message }) => {
+export default function MessageContent({
+  message,
+}: {
+  message: protobuf.Type;
+}) {
   return (
     <div>
       <ContentHeader object={message} />
       <MessageTable message={message} />
     </div>
   );
-};
-
-export default MessageContent;
+}

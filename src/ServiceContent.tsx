@@ -18,9 +18,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
+export default function ServiceContent({
   service,
-}) => {
+}: {
+  service: protobuf.Service;
+}) {
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -55,6 +57,4 @@ const ServiceContent: React.FC<{ service: protobuf.Service }> = ({
       ))}
     </div>
   );
-};
-
-export default ServiceContent;
+}

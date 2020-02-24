@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // enum is a reserved word, hence enm prop
-const EnumContent: React.FC<{ enm: protobuf.Enum }> = ({ enm }) => {
+export default function EnumContent({ enm }: { enm: protobuf.Enum }) {
   const classes = useStyles();
 
   return (
@@ -41,6 +41,4 @@ const EnumContent: React.FC<{ enm: protobuf.Enum }> = ({ enm }) => {
       </Paper>
     </div>
   );
-};
-
-export default EnumContent;
+}

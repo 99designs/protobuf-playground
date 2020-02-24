@@ -71,11 +71,15 @@ const contentFor = (
   return null;
 };
 
-const AppFrame: React.FC<{
+export default function AppFrame({
+  root,
+  selected,
+  title,
+}: {
   root: protobuf.Root;
   selected: protobuf.ReflectionObject | null;
   title: string;
-}> = ({ root, selected, title }) => {
+}) {
   const classes = useStyles();
   useEffect(() => {
     let newTitle = title;
@@ -114,6 +118,4 @@ const AppFrame: React.FC<{
       <main className={classes.content}>{content}</main>
     </div>
   );
-};
-
-export default AppFrame;
+}

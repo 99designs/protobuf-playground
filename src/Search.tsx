@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Search: React.FC<{ root: protobuf.Root }> = ({ root }) => {
+export default function Search({ root }: { root: protobuf.Root }) {
   const classes = useStyles();
   const fuse = useMemo(() => {
     const input = flatten(root);
@@ -127,6 +127,4 @@ const Search: React.FC<{ root: protobuf.Root }> = ({ root }) => {
       </Popper>
     </>
   );
-};
-
-export default Search;
+}

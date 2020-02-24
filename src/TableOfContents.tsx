@@ -43,9 +43,11 @@ const useStyles = makeStyles(theme => ({
   active: {},
 }));
 
-const TableOfContents: React.FC<{
+export default function TableOfContents({
+  object,
+}: {
   object: protobuf.ReflectionObject | null;
-}> = ({ object }) => {
+}) {
   const classes = useStyles();
 
   const itemRefs = useRef<HTMLElement[]>([]);
@@ -99,8 +101,8 @@ const TableOfContents: React.FC<{
     };
   });
 
-  const clickedRef = React.useRef<boolean>(false);
-  const unsetClickedRef = React.useRef<number | null>(null);
+  const clickedRef = useRef<boolean>(false);
+  const unsetClickedRef = useRef<number | null>(null);
 
   const handleClick = (hash: string) => () => {
     clickedRef.current = true;
@@ -113,7 +115,7 @@ const TableOfContents: React.FC<{
     }
   };
 
-  React.useEffect(
+  useEffect(
     () => () => {
       if (unsetClickedRef.current) {
         window.clearTimeout(unsetClickedRef.current);
@@ -147,6 +149,4 @@ const TableOfContents: React.FC<{
       </Typography>
     </div>
   );
-};
-
-export default TableOfContents;
+}

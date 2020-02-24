@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ContentsItem: React.FC<{
+export default function ContentsItem(props: {
   startOpen?: boolean;
   href?: string;
   title: string;
@@ -33,7 +33,7 @@ const ContentsItem: React.FC<{
   classes?: any;
   selected?: boolean;
   icon?: React.ReactElement;
-}> = props => {
+}) {
   const { startOpen, href, title, children, depth, selected, icon } = props;
   const [open, setOpen] = useState(startOpen);
   const handleClick = () => {
@@ -88,6 +88,4 @@ const ContentsItem: React.FC<{
       </Collapse>
     </>
   );
-};
-
-export default ContentsItem;
+}

@@ -14,9 +14,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const ContentHeader: React.FC<{
+export default function ContentHeader({
+  object,
+}: {
   object: protobuf.ReflectionObject;
-}> = ({ object }) => {
+}) {
   const classes = useStyles();
   return (
     <>
@@ -28,6 +30,4 @@ const ContentHeader: React.FC<{
       <Box m={6} />
     </>
   );
-};
-
-export default ContentHeader;
+}

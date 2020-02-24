@@ -53,10 +53,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
-  field,
-  depth,
-}) => {
+function FieldRow({ field, depth }: { field: protobuf.Field; depth: number }) {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const style = {
@@ -99,12 +96,15 @@ const FieldRow: React.FC<{ field: protobuf.Field; depth: number }> = ({
         )}
     </>
   );
-};
+}
 
-const MessageTableInner: React.FC<{
+function MessageTableInner({
+  message,
+  depth = 0,
+}: {
   message: protobuf.Type;
   depth?: number;
-}> = ({ message, depth = 0 }) => {
+}) {
   return (
     <>
       {message.fieldsArray.map(field => (
@@ -112,12 +112,15 @@ const MessageTableInner: React.FC<{
       ))}
     </>
   );
-};
+}
 
-const MessageTable: React.FC<{
+export default function MessageTable({
+  message,
+  type,
+}: {
   message: protobuf.Type;
   type?: 'request' | 'response';
-}> = ({ message, type }) => {
+}) {
   const classes = useStyles();
   return (
     <Paper className={classes.root}>
@@ -146,6 +149,4 @@ const MessageTable: React.FC<{
       </Table>
     </Paper>
   );
-};
-
-export default MessageTable;
+}

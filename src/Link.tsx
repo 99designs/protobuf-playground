@@ -14,8 +14,6 @@ interface LinkProps extends MuiLinkProps {
   to: string;
 }
 
-const Link = (props: LinkProps) => (
-  <MuiLink {...props} component={RouterLink as any} />
-);
-
-export default Link;
+export default function Link(props: LinkProps) {
+  return <MuiLink {...props} component={RouterLink as any} />;
+}

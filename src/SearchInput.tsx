@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef, Ref } from 'react';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase, { InputBaseProps } from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
@@ -41,26 +41,24 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const SearchInput = React.forwardRef<HTMLDivElement, InputBaseProps>(
-  (props, ref) => {
-    const classes = useStyles();
-    return (
-      <div className={classes.root}>
-        <div className={classes.icon}>
-          <SearchIcon />
-        </div>
-        <InputBase
-          placeholder="Search…"
-          classes={{
-            root: classes.inputRoot,
-            input: classes.inputInput,
-          }}
-          inputRef={ref}
-          {...props}
-        />
+function SearchInput(props: InputBaseProps, ref: Ref<HTMLDivElement>) {
+  const classes = useStyles();
+  return (
+    <div className={classes.root}>
+      <div className={classes.icon}>
+        <SearchIcon />
       </div>
-    );
-  }
-);
+      <InputBase
+        placeholder="Search…"
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput,
+        }}
+        inputRef={ref}
+        {...props}
+      />
+    </div>
+  );
+}
 
-export default SearchInput;
+export default forwardRef(SearchInput);

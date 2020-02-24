@@ -11,9 +11,9 @@ import Tab from '@material-ui/core/Tab';
 import Playground from './Playground';
 import ContentHeader from './ContentHeader';
 
-const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
+export default function MethodContent({ method }: { method: protobuf.Method }) {
   const [tab, setTab] = useState(0);
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (_: React.ChangeEvent<{}>, newValue: number) => {
     setTab(newValue);
   };
   return (
@@ -52,6 +52,4 @@ const MethodContent: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       )}
     </div>
   );
-};
-
-export default MethodContent;
+}

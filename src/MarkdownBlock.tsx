@@ -9,15 +9,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // TODO Markdown parsing is pretty slow, consider something like the `marked` package
-const MarkdownBlock: React.FC<{ children?: string | null }> = ({
+export default function MarkdownBlock({
   children,
-}) => {
+}: {
+  children?: string | null;
+}) {
   const classes = useStyles();
   return children ? (
     <div className={classes.root}>
       <Markdown options={{ forceBlock: true }}>{children}</Markdown>
     </div>
   ) : null;
-};
-
-export default MarkdownBlock;
+}

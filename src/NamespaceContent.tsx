@@ -20,9 +20,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const NamespaceContent: React.FC<{ namespace: protobuf.Namespace }> = ({
+export default function NamespaceContent({
   namespace,
-}) => {
+}: {
+  namespace: protobuf.Namespace;
+}) {
   const classes = useStyles();
   const sorted = [...namespace.nestedArray];
   sorted.sort((a, b) => a.name.localeCompare(b.name));
@@ -41,6 +43,4 @@ const NamespaceContent: React.FC<{ namespace: protobuf.Namespace }> = ({
       </Typography>
     </div>
   );
-};
-
-export default NamespaceContent;
+}

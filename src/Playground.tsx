@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
   response: {},
 }));
 
-const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
+export default function Playground({ method }: { method: protobuf.Method }) {
   const editorCm = useRef<CodeMirror.EditorFromTextArea>();
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const responseCm = useRef<CodeMirror.EditorFromTextArea>();
@@ -118,6 +118,4 @@ const Playground: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       </div>
     </>
   );
-};
-
-export default Playground;
+}

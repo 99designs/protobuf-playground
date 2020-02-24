@@ -6,7 +6,7 @@ import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   messageRoot: {
     display: 'flex',
     flexDirection: 'column',
@@ -15,10 +15,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const App: React.FC<{ jsonUrl: string; title: string }> = ({
+export default function App({
   jsonUrl,
   title,
-}) => {
+}: {
+  jsonUrl: string;
+  title: string;
+}) {
   // TODO replace all this loading logic with suspense
   const [loadState, setLoadState] = useState<
     'loading' | 'longLoading' | 'error' | 'done'
@@ -81,6 +84,4 @@ const App: React.FC<{ jsonUrl: string; title: string }> = ({
       )}
     </BrowserRouter>
   );
-};
-
-export default App;
+}
