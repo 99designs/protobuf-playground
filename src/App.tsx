@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Route, BrowserRouter } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Route, BrowserRouter, RouteComponentProps } from 'react-router-dom';
 import AppFrame from './AppFrame';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import ProtoContext from './ProtoContext';
 
 const useStyles = makeStyles(() => ({
   messageRoot: {
@@ -14,6 +15,36 @@ const useStyles = makeStyles(() => ({
     paddingTop: '20vh',
   },
 }));
+
+function InnerApp({
+  match,
+  root,
+  title,
+}: RouteComponentProps<{ object: string }> & {
+  root: protobuf.Root;
+  title: string;
+}) {
+  let selected: protobuf.ReflectionObject | null = null;
+  if (match) {
+    selected = root.lookup(match.params.object);
+  }
+
+  useEffect(() => {
+    let newTitle = title;
+    if (selected) {
+      newTitle = `${selected.name} — ${newTitle}`;
+    }
+    document.title = newTitle;
+  }, [selected, title]);
+
+  const frame = useMemo(() => <AppFrame title={title} />, [title]);
+
+  return (
+    <ProtoContext.Provider value={{ root, selected, getUsages: () => [] }}>
+      {frame}
+    </ProtoContext.Provider>
+  );
+}
 
 export default function App({
   jsonUrl,
@@ -57,19 +88,12 @@ export default function App({
       })
       .catch(error);
   }, [jsonUrl]);
+
   return (
     <BrowserRouter>
       <CssBaseline />
       {loadState === 'done' && root && (
-        <Route path="/:object">
-          {({ match }) => {
-            let selected = null;
-            if (match) {
-              selected = root.lookup(match.params.object);
-            }
-            return <AppFrame title={title} root={root} selected={selected} />;
-          }}
-        </Route>
+        <Route path="/:object" component={InnerApp} />
       )}
       {loadState === 'longLoading' && (
         <div className={classes.messageRoot}>

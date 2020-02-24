@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -14,6 +14,7 @@ import ServiceContent from './ServiceContent';
 import TableOfContents from './TableOfContents';
 import Breadcrumbs from './Breadcrumbs';
 import Search from './Search';
+import ProtoContext from './ProtoContext';
 
 const drawerWidth = 300;
 
@@ -49,50 +50,50 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const contentFor = (
-  selected: protobuf.ReflectionObject | null
-): React.ReactNode => {
-  console.log('content for', selected);
-  if (selected instanceof protobuf.Method) {
-    return <MethodContent method={selected} />;
-  }
-  if (selected instanceof protobuf.Type) {
-    return <MessageContent message={selected} />;
-  }
-  if (selected instanceof protobuf.Service) {
-    return <ServiceContent service={selected} />;
-  }
-  if (selected instanceof protobuf.Enum) {
-    return <EnumContent enm={selected} />;
-  }
-  if (selected instanceof protobuf.Namespace) {
-    return <NamespaceContent namespace={selected} />;
-  }
-  return null;
+const ContentContainer = () => {
+  const { selected } = useContext(ProtoContext);
+  return useMemo(() => {
+    if (selected instanceof protobuf.Method) {
+      return <MethodContent method={selected} />;
+    }
+    if (selected instanceof protobuf.Type) {
+      return <MessageContent message={selected} />;
+    }
+    if (selected instanceof protobuf.Service) {
+      return <ServiceContent service={selected} />;
+    }
+    if (selected instanceof protobuf.Enum) {
+      return <EnumContent enm={selected} />;
+    }
+    if (selected instanceof protobuf.Namespace) {
+      return <NamespaceContent namespace={selected} />;
+    }
+    return null;
+  }, [selected]);
 };
 
-export default function AppFrame({
-  root,
-  selected,
-  title,
-}: {
-  root: protobuf.Root;
-  selected: protobuf.ReflectionObject | null;
-  title: string;
-}) {
+function BreadcrumbsContainer() {
+  const { selected } = useContext(ProtoContext);
+  return useMemo(() => (selected ? <Breadcrumbs object={selected} /> : null), [
+    selected,
+  ]);
+}
+
+function ContentsContainer() {
+  const { root, selected } = useContext(ProtoContext);
+  return useMemo(() => <Contents selected={selected} root={root} />, [
+    root,
+    selected,
+  ]);
+}
+
+function TableOfContentsContainer() {
+  const { selected } = useContext(ProtoContext);
+  return useMemo(() => <TableOfContents object={selected} />, [selected]);
+}
+
+export default function AppFrame({ title }: { title: string }) {
   const classes = useStyles();
-  useEffect(() => {
-    let newTitle = title;
-    if (selected) {
-      newTitle = `${selected.name} — ${newTitle}`;
-    }
-    document.title = newTitle;
-  }, [selected, title]);
-  const drawerContents = useMemo(
-    () => <Contents root={root} selected={selected} />,
-    [root, selected]
-  );
-  const content = useMemo(() => contentFor(selected), [selected]);
   return (
     <div className={classes.root}>
       <Drawer
@@ -105,17 +106,19 @@ export default function AppFrame({
           <span>{title}</span>
         </div>
         <Divider />
-        {drawerContents}
+        <ContentsContainer />
       </Drawer>
       <AppBar className={classes.appBar}>
         <Toolbar>
-          {selected && <Breadcrumbs object={selected} />}
+          <BreadcrumbsContainer />
           <div className={classes.grow} />
-          <Search root={root} />
+          <Search />
         </Toolbar>
       </AppBar>
-      <TableOfContents object={selected} />
-      <main className={classes.content}>{content}</main>
+      <TableOfContentsContainer />
+      <main className={classes.content}>
+        <ContentContainer />
+      </main>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useContext } from 'react';
 import Popper from '@material-ui/core/Popper';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,6 +8,7 @@ import protobuf from 'protobufjs';
 import SearchInput from './SearchInput';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
+import ProtoContext from './ProtoContext';
 
 const useStyles = makeStyles(theme => ({
   resultsPaper: {
@@ -45,7 +46,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Search({ root }: { root: protobuf.Root }) {
+export default function Search() {
+  const { root } = useContext(ProtoContext);
   const classes = useStyles();
   const fuse = useMemo(() => {
     const input = flatten(root);
