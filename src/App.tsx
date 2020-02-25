@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Route, BrowserRouter, RouteComponentProps } from 'react-router-dom';
+import { Route, BrowserRouter } from 'react-router-dom';
+import { RouteChildrenProps } from 'react-router';
 import AppFrame from './AppFrame';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import protobuf from 'protobufjs';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import ProtoContext from './ProtoContext';
+import { buildUsageIndex } from './proto';
 
 const useStyles = makeStyles(() => ({
   messageRoot: {
@@ -20,7 +22,7 @@ function InnerApp({
   match,
   root,
   title,
-}: RouteComponentProps<{ object: string }> & {
+}: RouteChildrenProps<{ object: string }> & {
   root: protobuf.Root;
   title: string;
 }) {
@@ -39,8 +41,20 @@ function InnerApp({
 
   const frame = useMemo(() => <AppFrame title={title} />, [title]);
 
+  const getUsages = useMemo(() => {
+    const usageIndex = buildUsageIndex(root);
+    return (obj: protobuf.ReflectionObject) => usageIndex[obj.fullName] || [];
+  }, [root]);
+
   return (
-    <ProtoContext.Provider value={{ root, selected, getUsages: () => [] }}>
+    <ProtoContext.Provider
+      value={{
+        root,
+        selected,
+        getUsages,
+      }}
+    >
+      foobar
       {frame}
     </ProtoContext.Provider>
   );
@@ -93,7 +107,9 @@ export default function App({
     <BrowserRouter>
       <CssBaseline />
       {loadState === 'done' && root && (
-        <Route path="/:object" component={InnerApp} />
+        <Route path="/:object">
+          {props => <InnerApp root={root} title={title} {...props} />}
+        </Route>
       )}
       {loadState === 'longLoading' && (
         <div className={classes.messageRoot}>

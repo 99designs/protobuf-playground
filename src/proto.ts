@@ -1,69 +1,69 @@
-import protobuf from 'protobufjs';
+import protobuf, { ReflectionObject } from 'protobufjs';
 
 // Utility functions for working with protobufjs objects.  Mostly covering gaps in their
 // API for our common use-cases.
 
-const byName = (a: { name: string }, b: { name: string }) =>
-  a.name.localeCompare(b.name);
+function byName(a: { name: string }, b: { name: string }) {
+  return a.name.localeCompare(b.name);
+}
 
 // TODO make these set of functions work through generics <T extends protobuf.ReflectionObject>
 
-export const namespaces = (
-  namespace: protobuf.Namespace
-): protobuf.Namespace[] => {
+export function namespaces(namespace: protobuf.Namespace) {
   const namespaces = namespace.nestedArray.filter(
     (o): o is protobuf.Service => o instanceof protobuf.Namespace
   );
   namespaces.sort(byName);
   return namespaces;
-};
+}
 
-export const services = (namespace: protobuf.Namespace): protobuf.Service[] => {
+export function services(namespace: protobuf.Namespace) {
   const services = namespace.nestedArray.filter(
     (o): o is protobuf.Service => o instanceof protobuf.Service
   );
   services.sort(byName);
   return services;
-};
+}
 
-export const messages = (namespace: protobuf.Namespace): protobuf.Type[] => {
+export function messages(namespace: protobuf.Namespace) {
   const messages = namespace.nestedArray.filter(
     (o): o is protobuf.Type => o instanceof protobuf.Type
   );
   messages.sort(byName);
   return messages;
-};
+}
 
-export const enums = (namespace: protobuf.Namespace): protobuf.Enum[] => {
+export function enums(namespace: protobuf.Namespace) {
   const enums = namespace.nestedArray.filter(
     (o): o is protobuf.Enum => o instanceof protobuf.Enum
   );
   enums.sort(byName);
   return enums;
-};
+}
 
-export const methods = (srv: protobuf.Service): protobuf.Method[] => {
+export function methods(srv: protobuf.Service) {
   const methods = [...srv.methodsArray];
   methods.sort(byName);
   return methods;
-};
+}
 
-export const parentOf = (
+export function parentOf(
   parent: protobuf.ReflectionObject,
   child: protobuf.ReflectionObject | null
-): boolean => {
+) {
   return child ? heirarchy(child).includes(parent) : false;
-};
+}
 
-export const heirarchy = (
+export function heirarchy(
   obj: protobuf.ReflectionObject
-): protobuf.ReflectionObject[] =>
-  obj.parent === null || obj.parent instanceof protobuf.Root
+): protobuf.ReflectionObject[] {
+  return obj.parent === null || obj.parent instanceof protobuf.Root
     ? [obj]
     : [...heirarchy(obj.parent), obj];
+}
 
 // Produces a JSON object that is a template for a given message.
-export const jsonTemplate = (message: protobuf.Type): any => {
+export function jsonTemplate(message: protobuf.Type): any {
   const tmpl: any = {};
   message.fieldsArray.forEach(field => {
     // TODO better handling of repeated template - should probably fill out 1 value.
@@ -93,12 +93,12 @@ export const jsonTemplate = (message: protobuf.Type): any => {
     }
   });
   return tmpl;
-};
+}
 
 // Returns obj.fullName without the first period.
-export const fullName = (obj: protobuf.ReflectionObject): string => {
+export function fullName(obj: protobuf.ReflectionObject) {
   return obj.fullName[0] === '.' ? obj.fullName.substr(1) : obj.fullName;
-};
+}
 
 export const typeName = (obj: protobuf.ReflectionObject): string => {
   if (obj instanceof protobuf.Service) {
@@ -120,27 +120,63 @@ export const typeName = (obj: protobuf.ReflectionObject): string => {
 };
 
 // Returns a sorted list of enum values as tuples ordered by id
-export const valuesByID = (
-  enm: protobuf.Enum
-): { id: number; value: string }[] => {
+export function valuesByID(enm: protobuf.Enum) {
   return Object.keys(enm.values)
     .map(value => ({ id: enm.values[value], value }))
     .sort((a, b) => a.id - b.id);
-};
+}
 
 // Reducer to flatten out array of proto objects.
-const _flatten = (
+function _flatten(
   arr: protobuf.ReflectionObject[],
   obj: protobuf.ReflectionObject
-): protobuf.ReflectionObject[] => {
+) {
   if (!(obj instanceof protobuf.Root)) {
     arr.push(obj);
   }
   if (obj instanceof protobuf.Namespace) {
     obj.nestedArray.reduce(_flatten, arr);
   }
+  if (obj instanceof protobuf.Service) {
+    obj.methodsArray.reduce(_flatten, arr);
+  }
   return arr;
-};
+}
 
-export const flatten = (obj: protobuf.Namespace): protobuf.ReflectionObject[] =>
-  _flatten([], obj);
+export function flatten(obj: protobuf.Namespace) {
+  return _flatten([], obj);
+}
+
+// Builds an index of objects mapped to an array of objects that reference them.
+export function buildUsageIndex(root: protobuf.Root) {
+  const index: { [k: string]: protobuf.ReflectionObject[] } = {};
+  flatten(root).forEach(obj => {
+    const add = (k: protobuf.ReflectionObject) => {
+      k.fullName in index || (index[k.fullName] = []);
+      if (!index[k.fullName].includes(obj)) {
+        index[k.fullName].push(obj);
+      }
+    };
+
+    if (obj instanceof protobuf.Service) {
+      obj.methodsArray.forEach(method => add(method));
+      obj.nestedArray.forEach(nested => add(nested));
+    }
+    if (obj instanceof protobuf.Method) {
+      add(obj.resolvedRequestType!);
+      add(obj.resolvedResponseType!);
+    }
+    if (obj instanceof protobuf.Type) {
+      obj.fieldsArray.forEach(field => add(field));
+    }
+    if (obj instanceof protobuf.Namespace) {
+      obj.nestedArray.forEach(nested => add(nested));
+    }
+  });
+  const sorted = Object.keys(index);
+  sorted.sort((a, b) => {
+    return index[b].length - index[a].length;
+  });
+  console.log(sorted);
+  return index;
+}
