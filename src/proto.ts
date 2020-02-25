@@ -167,16 +167,12 @@ export function buildUsageIndex(root: protobuf.Root) {
       add(obj.resolvedResponseType!);
     }
     if (obj instanceof protobuf.Type) {
-      obj.fieldsArray.forEach(field => add(field));
-    }
-    if (obj instanceof protobuf.Namespace) {
-      obj.nestedArray.forEach(nested => add(nested));
+      obj.fieldsArray.forEach(field => {
+        if (field.resolvedType) {
+          add(field.resolvedType);
+        }
+      });
     }
   });
-  const sorted = Object.keys(index);
-  sorted.sort((a, b) => {
-    return index[b].length - index[a].length;
-  });
-  console.log(sorted);
   return index;
 }
