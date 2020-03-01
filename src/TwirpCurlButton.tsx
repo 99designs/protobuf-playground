@@ -11,6 +11,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Fade,
 } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import CloseIcon from '@material-ui/icons/Close';
@@ -87,28 +88,35 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
         open={modalOpen}
         className={classes.modal}
         onBackdropClick={() => setModalOpen(false)}
+        onKeyDown={e => {
+          if (e.keyCode === 27) {
+            setModalOpen(false);
+          }
+        }}
       >
-        <Paper className={classes.modalContent}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell className={classes.title}>
-                  <span>{method.name}</span>
-                  <IconButton onClick={handleCopyClick}>
-                    <Tooltip title="Copy Twirp cURL request" placement="top">
-                      <FileCopyIcon fontSize="small" />
-                    </Tooltip>
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <code className={classes.code}>
-                {twirpCurl(method, baseUrl, username, password, true)}
-              </code>
-            </TableBody>
-          </Table>
-        </Paper>
+        <Fade in={modalOpen}>
+          <Paper className={classes.modalContent}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell className={classes.title}>
+                    <span>{method.name}</span>
+                    <IconButton onClick={handleCopyClick}>
+                      <Tooltip title="Copy Twirp cURL request" placement="top">
+                        <FileCopyIcon fontSize="small" />
+                      </Tooltip>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <code className={classes.code}>
+                  {twirpCurl(method, baseUrl, username, password, true)}
+                </code>
+              </TableBody>
+            </Table>
+          </Paper>
+        </Fade>
       </Modal>
     </>
   );
