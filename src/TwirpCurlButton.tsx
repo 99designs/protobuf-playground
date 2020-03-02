@@ -35,9 +35,16 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    fontSize: '16px',
+    backgroundColor: theme.palette.grey[100],
+    borderTopLeftRadius: theme.shape.borderRadius,
+    borderTopRightRadius: theme.shape.borderRadius,
   },
   input: {
     marginRight: theme.spacing(2),
+  },
+  pre: {
+    margin: 0,
   },
   code: {
     display: 'block',
@@ -45,11 +52,17 @@ const useStyles = makeStyles(theme => ({
     maxHeight: '54em',
     overflowY: 'auto',
     padding: theme.spacing(2),
-    backgroundColor: 'black',
+    backgroundColor: theme.palette.grey[900],
     color: 'white',
     borderRadius: theme.shape.borderRadius,
     fontSize: '12px',
     fontFamily: 'Monaco, monospace',
+  },
+  tableCellNoBottomBorder: {
+    borderBottom: 'none',
+  },
+  tableCellNoBottomPadding: {
+    paddingBottom: 0,
   },
 }));
 
@@ -58,7 +71,7 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [snackbarShowing, setSnackbarShowing] = React.useState(false);
-  const [baseUrl, setBaseUrl] = React.useState('https://example.com/api/');
+  const [baseUrl, setBaseUrl] = React.useState('https://example.com/api');
   const [username, setUsername] = React.useState('username');
   const [password, setPassword] = React.useState('password');
 
@@ -124,7 +137,9 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  <TableCell>
+                  <TableCell
+                    className={`${classes.tableCellNoBottomBorder} ${classes.tableCellNoBottomPadding}`}
+                  >
                     <TextField
                       id="base-url"
                       label="Base URL"
@@ -152,8 +167,8 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>
-                    <pre>
+                  <TableCell className={classes.tableCellNoBottomBorder}>
+                    <pre className={classes.pre}>
                       <code
                         className={classes.code}
                         dangerouslySetInnerHTML={{ __html: formattedTwirpCurl }}
