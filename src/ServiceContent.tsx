@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import MarkdownBlock from './MarkdownBlock';
 import ContentHeader from './ContentHeader';
 import TwirpCurlButton from './TwirpCurlButton';
+import ProtoContext from './ProtoContext';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -28,6 +29,7 @@ export default function ServiceContent({
   service: protobuf.Service;
 }) {
   const classes = useStyles();
+  const { twirpBaseUrl } = React.useContext(ProtoContext);
   return (
     <div className={classes.root}>
       <ContentHeader object={service} />
@@ -47,7 +49,7 @@ export default function ServiceContent({
               />
               {method.name}
             </Typography>
-            <TwirpCurlButton method={method} />
+            <TwirpCurlButton method={method} baseUrl={twirpBaseUrl} />
           </div>
 
           <MarkdownBlock>{method.comment}</MarkdownBlock>

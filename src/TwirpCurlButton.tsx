@@ -12,7 +12,6 @@ import {
   TableCell,
   TableBody,
   Fade,
-  TextField,
 } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import CloseIcon from '@material-ui/icons/Close';
@@ -66,54 +65,27 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-interface Config {
+const TwirpCurlButton: React.FC<{
+  method: protobuf.Method;
   baseUrl: string;
-  username: string;
-  password: string;
-}
-
-const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
+}> = ({ method, baseUrl }) => {
   const classes = useStyles();
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [snackbarShowing, setSnackbarShowing] = React.useState(false);
 
-  const defaultConfig: Config = {
-    baseUrl: '',
-    username: '',
-    password: '',
-  };
-  const [config, setConfig] = React.useState<Config>(defaultConfig);
-
   const formattedTwirpCurl = React.useMemo(
-    () =>
-      twirpCurl(method, config.baseUrl, config.username, config.password, true),
-    [method, config.baseUrl, config.username, config.password]
+    () => twirpCurl(method, baseUrl, '', '', true),
+    [method, baseUrl]
   );
 
   const handleClose = () => {
     setModalOpen(false);
-    setConfig(defaultConfig);
   };
 
   const handleCopyClick = async () => {
-    await navigator.clipboard.writeText(
-      twirpCurl(method, config.baseUrl, config.username, config.password)
-    );
+    await navigator.clipboard.writeText(twirpCurl(method, baseUrl, '', ''));
     setSnackbarShowing(true);
-  };
-
-  const handleTextFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    field: keyof Config
-  ) => {
-    const value = e.target.value;
-    setConfig(c => {
-      return {
-        ...c,
-        [field]: value,
-      };
-    });
   };
 
   return (
@@ -165,26 +137,6 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell
-                    className={`${classes.tableCellNoBottomBorder} ${classes.tableCellNoBottomPadding}`}
-                  >
-                    {Object.keys(config).map(key => {
-                      const field = key as keyof Config;
-                      return (
-                        <TextField
-                          id={key}
-                          label={key}
-                          variant="outlined"
-                          size="small"
-                          className={classes.input}
-                          onChange={e => handleTextFieldChange(e, field)}
-                          value={config[field]}
-                        />
-                      );
-                    })}
-                  </TableCell>
-                </TableRow>
                 <TableRow>
                   <TableCell className={classes.tableCellNoBottomBorder}>
                     <pre className={classes.pre}>

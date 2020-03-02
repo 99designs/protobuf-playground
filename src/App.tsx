@@ -22,9 +22,11 @@ function InnerApp({
   match,
   root,
   title,
+  twirpBaseUrl,
 }: RouteChildrenProps<{ object: string }> & {
   root: protobuf.Root;
   title: string;
+  twirpBaseUrl: string;
 }) {
   let selected: protobuf.ReflectionObject | null = null;
   if (match) {
@@ -52,6 +54,7 @@ function InnerApp({
         root,
         selected,
         getUsages,
+        twirpBaseUrl,
       }}
     >
       foobar
@@ -63,9 +66,11 @@ function InnerApp({
 export default function App({
   jsonUrl,
   title,
+  twirpBaseUrl,
 }: {
   jsonUrl: string;
   title: string;
+  twirpBaseUrl: string;
 }) {
   // TODO replace all this loading logic with suspense
   const [loadState, setLoadState] = useState<
@@ -108,7 +113,14 @@ export default function App({
       <CssBaseline />
       {loadState === 'done' && root && (
         <Route path="/:object">
-          {props => <InnerApp root={root} title={title} {...props} />}
+          {props => (
+            <InnerApp
+              root={root}
+              title={title}
+              twirpBaseUrl={twirpBaseUrl}
+              {...props}
+            />
+          )}
         </Route>
       )}
       {loadState === 'longLoading' && (
