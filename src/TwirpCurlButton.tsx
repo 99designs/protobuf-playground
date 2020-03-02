@@ -66,25 +66,54 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+interface Config {
+  baseUrl: string;
+  username: string;
+  password: string;
+}
+
 const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const classes = useStyles();
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [snackbarShowing, setSnackbarShowing] = React.useState(false);
-  const [baseUrl, setBaseUrl] = React.useState('https://example.com/api');
-  const [username, setUsername] = React.useState('username');
-  const [password, setPassword] = React.useState('password');
+
+  const defaultConfig: Config = {
+    baseUrl: 'https://example.com/api',
+    username: 'username',
+    password: 'password',
+  };
+  const [config, setConfig] = React.useState<Config>(defaultConfig);
 
   const formattedTwirpCurl = React.useMemo(
-    () => twirpCurl(method, baseUrl, username, password, true),
-    [method, baseUrl, username, password]
+    () =>
+      twirpCurl(method, config.baseUrl, config.username, config.password, true),
+    [method, config.baseUrl, config.username, config.password]
   );
+
+  const handleClose = () => {
+    setModalOpen(false);
+    setConfig(defaultConfig);
+  };
 
   const handleCopyClick = async () => {
     await navigator.clipboard.writeText(
-      twirpCurl(method, baseUrl, username, password)
+      twirpCurl(method, config.baseUrl, config.username, config.password)
     );
     setSnackbarShowing(true);
+  };
+
+  const handleTextFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    field: keyof Config
+  ) => {
+    const value = e.target.value;
+    setConfig(c => {
+      return {
+        ...c,
+        [field]: value !== '' ? value : defaultConfig[field],
+      };
+    });
   };
 
   return (
@@ -113,10 +142,10 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
       <Modal
         open={modalOpen}
         className={classes.modal}
-        onBackdropClick={() => setModalOpen(false)}
+        onBackdropClick={() => handleClose()}
         onKeyDown={e => {
           if (e.keyCode === 27) {
-            setModalOpen(false);
+            handleClose();
           }
         }}
       >
@@ -140,30 +169,24 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
                   <TableCell
                     className={`${classes.tableCellNoBottomBorder} ${classes.tableCellNoBottomPadding}`}
                   >
-                    <TextField
-                      id="base-url"
-                      label="Base URL"
-                      variant="outlined"
-                      size="small"
-                      className={classes.input}
-                      onChange={e => setBaseUrl(e.target.value)}
-                    />
-                    <TextField
-                      id="username"
-                      label="Username"
-                      variant="outlined"
-                      size="small"
-                      className={classes.input}
-                      onChange={e => setUsername(e.target.value)}
-                    />
-                    <TextField
-                      id="password"
-                      label="Password"
-                      variant="outlined"
-                      size="small"
-                      className={classes.input}
-                      onChange={e => setPassword(e.target.value)}
-                    />
+                    {Object.keys(config).map(key => {
+                      const field = key as keyof Config;
+                      return (
+                        <TextField
+                          id={key}
+                          label={key}
+                          variant="outlined"
+                          size="small"
+                          className={classes.input}
+                          onChange={e => handleTextFieldChange(e, field)}
+                          value={
+                            config[field] === defaultConfig[field]
+                              ? ''
+                              : config[field]
+                          }
+                        />
+                      );
+                    })}
                   </TableCell>
                 </TableRow>
                 <TableRow>
