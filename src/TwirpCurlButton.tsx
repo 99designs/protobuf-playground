@@ -78,7 +78,7 @@ function TwirpCurlButton({
   const [snackbarShowing, setSnackbarShowing] = React.useState(false);
 
   const formattedTwirpCurl = React.useMemo(
-    () => twirpCurl(method, baseUrl, '', '', true),
+    () => twirpCurl(method, baseUrl, 'username', 'password', true),
     [method, baseUrl]
   );
 
@@ -87,7 +87,9 @@ function TwirpCurlButton({
   };
 
   const handleCopyClick = async () => {
-    await navigator.clipboard.writeText(twirpCurl(method, baseUrl, '', ''));
+    await navigator.clipboard.writeText(
+      twirpCurl(method, baseUrl, 'username', 'password')
+    );
     setSnackbarShowing(true);
   };
 
