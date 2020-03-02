@@ -65,10 +65,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const TwirpCurlButton: React.FC<{
+function TwirpCurlButton({
+  method,
+  baseUrl,
+}: {
   method: protobuf.Method;
   baseUrl: string;
-}> = ({ method, baseUrl }) => {
+}) {
   const classes = useStyles();
 
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -154,6 +157,6 @@ const TwirpCurlButton: React.FC<{
       </Modal>
     </>
   );
-};
+}
 
 export default TwirpCurlButton;
