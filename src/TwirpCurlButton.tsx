@@ -12,6 +12,7 @@ import {
   TableCell,
   TableBody,
   Fade,
+  TextField,
 } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import CloseIcon from '@material-ui/icons/Close';
@@ -35,24 +36,36 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  input: {
+    marginRight: theme.spacing(2),
+  },
   code: {
     display: 'block',
     whiteSpace: 'pre-wrap',
     maxHeight: '54em',
     overflowY: 'auto',
     padding: theme.spacing(2),
+    backgroundColor: 'black',
+    color: 'white',
+    borderRadius: theme.shape.borderRadius,
+    fontSize: '12px',
+    fontFamily: 'Monaco, monospace',
   },
 }));
-
-const baseUrl = '';
-const username = '';
-const password = '';
 
 const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const classes = useStyles();
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [snackbarShowing, setSnackbarShowing] = React.useState(false);
+  const [baseUrl, setBaseUrl] = React.useState('https://example.com/api/');
+  const [username, setUsername] = React.useState('username');
+  const [password, setPassword] = React.useState('password');
+
+  const formattedTwirpCurl = React.useMemo(
+    () => twirpCurl(method, baseUrl, username, password, true),
+    [method, baseUrl, username, password]
+  );
 
   const handleCopyClick = async () => {
     await navigator.clipboard.writeText(
@@ -110,9 +123,44 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <code className={classes.code}>
-                  {twirpCurl(method, baseUrl, username, password, true)}
-                </code>
+                <TableRow>
+                  <TableCell>
+                    <TextField
+                      id="base-url"
+                      label="Base URL"
+                      variant="outlined"
+                      size="small"
+                      className={classes.input}
+                      onChange={e => setBaseUrl(e.target.value)}
+                    />
+                    <TextField
+                      id="username"
+                      label="Username"
+                      variant="outlined"
+                      size="small"
+                      className={classes.input}
+                      onChange={e => setUsername(e.target.value)}
+                    />
+                    <TextField
+                      id="password"
+                      label="Password"
+                      variant="outlined"
+                      size="small"
+                      className={classes.input}
+                      onChange={e => setPassword(e.target.value)}
+                    />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <pre>
+                      <code
+                        className={classes.code}
+                        dangerouslySetInnerHTML={{ __html: formattedTwirpCurl }}
+                      />
+                    </pre>
+                  </TableCell>
+                </TableRow>
               </TableBody>
             </Table>
           </Paper>

@@ -45,7 +45,7 @@ export const twirpCurl = (
   baseUrl: string = '',
   username: string = '',
   password: string = '',
-  formatJSON: boolean = false
+  prettify: boolean = false
 ) => {
   const url = urlFor(method, baseUrl);
   let data = '{}';
@@ -53,10 +53,14 @@ export const twirpCurl = (
     data = JSON.stringify(
       jsonTemplate(method.resolvedRequestType),
       null,
-      formatJSON ? 4 : 0
+      prettify ? 4 : 0
     );
   }
-  return `curl -X POST ${url} --user ${username}:${password} -H 'Content-Type:application/json' -d '${data}'`;
+  return `curl -X POST ${prettify ? `<strong>${url}</strong>` : url} --user ${
+    prettify ? `<strong>${username}</strong>` : username
+  }:${
+    prettify ? `<strong>${password}</strong>` : password
+  } -H 'Content-Type:application/json' -d '${data}'`;
 };
 
 // headers.set('Authorization', 'Basic ' + base64.encode(username + ":" + password));
