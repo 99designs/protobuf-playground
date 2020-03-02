@@ -47,6 +47,16 @@ export const twirpCurl = (
   password: string = '',
   prettify: boolean = false
 ) => {
+  if (baseUrl === '') {
+    baseUrl = 'https://example.com/api';
+  }
+  if (username === '') {
+    username = 'username';
+  }
+  if (password === '') {
+    password = 'password';
+  }
+
   const url = urlFor(method, baseUrl);
   let data = '{}';
   if (method.resolvedRequestType) {

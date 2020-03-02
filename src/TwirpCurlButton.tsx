@@ -79,9 +79,9 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
   const [snackbarShowing, setSnackbarShowing] = React.useState(false);
 
   const defaultConfig: Config = {
-    baseUrl: 'https://example.com/api',
-    username: 'username',
-    password: 'password',
+    baseUrl: '',
+    username: '',
+    password: '',
   };
   const [config, setConfig] = React.useState<Config>(defaultConfig);
 
@@ -111,7 +111,7 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
     setConfig(c => {
       return {
         ...c,
-        [field]: value !== '' ? value : defaultConfig[field],
+        [field]: value,
       };
     });
   };
@@ -179,11 +179,7 @@ const TwirpCurlButton: React.FC<{ method: protobuf.Method }> = ({ method }) => {
                           size="small"
                           className={classes.input}
                           onChange={e => handleTextFieldChange(e, field)}
-                          value={
-                            config[field] === defaultConfig[field]
-                              ? ''
-                              : config[field]
-                          }
+                          value={config[field]}
                         />
                       );
                     })}
