@@ -6,11 +6,16 @@ import MessageTable from './MessageTable';
 import { makeStyles } from '@material-ui/core/styles';
 import MarkdownBlock from './MarkdownBlock';
 import ContentHeader from './ContentHeader';
+import TwirpCurlButton from './TwirpCurlButton';
+import ProtoContext from './ProtoContext';
 
 const useStyles = makeStyles(theme => ({
   root: {},
   methodName: {
     position: 'relative',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
   },
   anchorLink: {
     marginTop: theme.spacing(-12), // Offset for the anchor.
@@ -24,20 +29,28 @@ export default function ServiceContent({
   service: protobuf.Service;
 }) {
   const classes = useStyles();
+  const { twirpBaseUrl } = React.useContext(ProtoContext);
   return (
     <div className={classes.root}>
       <ContentHeader object={service} />
 
       {methods(service).map(method => (
         <div key={method.fullName}>
-          <Typography variant="h5" gutterBottom className={classes.methodName}>
-            <a
-              href={`#${method.name}`}
-              id={method.name}
-              className={classes.anchorLink}
-            />
-            {method.name}
-          </Typography>
+          <div className={classes.methodName}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              className={classes.methodName}
+            >
+              <a
+                href={`#${method.name}`}
+                id={method.name}
+                className={classes.anchorLink}
+              />
+              {method.name}
+            </Typography>
+            <TwirpCurlButton method={method} baseUrl={twirpBaseUrl} />
+          </div>
 
           <MarkdownBlock>{method.comment}</MarkdownBlock>
 
