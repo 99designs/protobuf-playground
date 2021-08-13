@@ -73,7 +73,8 @@ export function jsonTemplate(message: protobuf.Type): any {
     }
     if (
       field.resolvedType !== null &&
-      field.resolvedType instanceof protobuf.Type
+      field.resolvedType instanceof protobuf.Type &&
+      field.type !== 'Struct' // the Struct type can have nested structs, which causes infinite recursion
     ) {
       tmpl[field.name] = jsonTemplate(field.resolvedType);
       return;
