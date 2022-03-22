@@ -98,7 +98,7 @@ export function jsonTemplate(message: protobuf.Type): any {
 
 // Returns obj.fullName without the first period.
 export function fullName(obj: protobuf.ReflectionObject) {
-  return obj.fullName[0] === '.' ? obj.fullName.substr(1) : obj.fullName;
+  return obj.fullName[0] === '.' ? obj.fullName.slice(1) : obj.fullName;
 }
 
 export const typeName = (obj: protobuf.ReflectionObject): string => {
