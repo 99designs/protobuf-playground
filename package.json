@@ -17,7 +17,7 @@
     "codemirror": "^5.49.2",
     "fuse.js": "^3.4.6",
     "lodash": "^4.17.15",
-    "markdown-to-jsx": "^6.10.3",
+    "markdown-to-jsx": "^7.4.0",
     "protobufjs": "^6.8.8",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
